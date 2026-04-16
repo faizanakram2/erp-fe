@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 type SidebarProps = {
   isCollapsed: boolean;
@@ -12,16 +14,53 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
   const isExpanded = !isCollapsed;
 
   const menuItems = [
-    { id: "1", name: "Dashboard", icon: "/icons/dashboard.svg" },
-    { id: "2", name: "Land & Planning", icon: "/icons/landAndPlanning.svg" },
-    { id: "3", name: "Construction", icon: "/icons/construction.svg" },
-    { id: "4", name: "Sales & CRM", icon: "/icons/salesAndCrm.svg" },
-    { id: "5", name: "Human Resources", icon: "/icons/HumanResources.svg" },
-    { id: "6", name: "Finance & Accounting", icon: "/icons/Finance.svg" },
-    { id: "7", name: "Inventory", icon: "/icons/inventory.svg" },
-    { id: "8", name: "Reports", icon: "/icons/reports.svg" },
-    { id: "9", name: "Settings", icon: "/icons/settings.svg" },
+    { id: "1", label: "Dashboard", icon: "/icons/dashboard.svg", href: "/" },
+    {
+      id: "2",
+      label: "Land & Planning",
+      icon: "/icons/landAndPlanning.svg",
+      href: "/land-and-planning",
+    },
+    {
+      id: "3",
+      label: "Construction",
+      icon: "/icons/construction.svg",
+      href: "/construction",
+    },
+    {
+      id: "4",
+      label: "Sales & CRM",
+      icon: "/icons/salesAndCrm.svg",
+      href: "/sales-crm",
+    },
+    {
+      id: "5",
+      label: "Human Resources",
+      icon: "/icons/HumanResources.svg",
+      href: "/human-resources",
+    },
+    {
+      id: "6",
+      label: "Finance & Accounting",
+      icon: "/icons/Finance.svg",
+      href: "/finance",
+    },
+    {
+      id: "7",
+      label: "Inventory",
+      icon: "/icons/inventory.svg",
+      href: "/inventory",
+    },
+    { id: "8", label: "Reports", icon: "/icons/reports.svg", href: "/reports" },
+    {
+      id: "9",
+      label: "Settings",
+      icon: "/icons/settings.svg",
+      href: "/settings",
+    },
   ];
+
+  const pathName = usePathname();
 
   return (
     <div
@@ -65,20 +104,23 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
         {/* MENU */}
         <div className="flex flex-col gap-0 w-full px-2 ">
           {menuItems.map((item) => (
-            <div
+            <Link
+              href={item.href}
               key={item.id}
-              className={`flex items-center gap-2 px-2 py-2 rounded-md cursor-pointer hover:bg-gray-100 ${
+              className={`flex items-center gap-2 px-2 py-2 rounded-md cursor-pointer ${item.href === pathName ? "bg-[#EEF2FF] " : ""} ${
                 isCollapsed ? "justify-center" : ""
               }`}
             >
-              <Image src={item.icon} alt={item.name} width={20} height={20} />
+              <Image src={item.icon} alt={item.label} width={20} height={20} />
 
               {isExpanded && (
-                <span className="text-[14px] font-medium text-[#64748B]">
-                  {item.name}
+                <span
+                  className={`text-[14px] font-medium  ${item.href === pathName ? "text-[#0070FF]" : "text-[#64748B] "}`}
+                >
+                  {item.label}
                 </span>
               )}
-            </div>
+            </Link>
           ))}
         </div>
       </div>
