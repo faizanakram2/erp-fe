@@ -32,7 +32,10 @@ const ActiveProjects = () => {
       <div className=" p-4 rounded-[6px] flex flex-col gap-6 bg-[#F9FAFB] p-4">
         {/* single project card */}
         {projects.map((project, index) => (
-          <div className="bg-[#FFFFFF] rounded-[10px] p-4 flex flex-col gap-2.5 ">
+          <div
+            key={index}
+            className="bg-[#FFFFFF] rounded-[10px] p-4 flex flex-col gap-2.5 "
+          >
             {/* description and Status */}
             <div className="flex w-full items-center justify-between">
               {/* description  and image */}
