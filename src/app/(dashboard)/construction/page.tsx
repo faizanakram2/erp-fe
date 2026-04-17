@@ -109,6 +109,7 @@ export default function Construction() {
           Material Inventory
         </button>
       </div>
+
       {activeTab === "activeProjects" ? (
         <ActiveProjects></ActiveProjects>
       ) : activeTab === "workStages" ? (
