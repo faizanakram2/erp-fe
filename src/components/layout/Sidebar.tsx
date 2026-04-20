@@ -8,10 +8,13 @@ import { usePathname } from "next/navigation";
 type SidebarProps = {
   isCollapsed: boolean;
   setIsCollapsed: React.Dispatch<React.SetStateAction<boolean>>;
+  /** Close mobile drawer after navigation */
+  onNavigate?: () => void;
 };
 
-const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
+const Sidebar = ({ isCollapsed, setIsCollapsed, onNavigate }: SidebarProps) => {
   const isExpanded = !isCollapsed;
+  const pathname = usePathname();
 
   const menuItems = [
     { id: "1", label: "Dashboard", icon: "/icons/dashboard.svg", href: "/" },
@@ -19,7 +22,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
       id: "2",
       label: "Land & Planning",
       icon: "/icons/landAndPlanning.svg",
-      href: "/land-and-planning",
+      href: "/land-planning",
     },
     {
       id: "3",
@@ -59,8 +62,6 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
       href: "/settings",
     },
   ];
-
-  const pathName = usePathname();
 
   return (
     <div
@@ -105,17 +106,22 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
         <div className="flex flex-col gap-0 w-full px-2 ">
           {menuItems.map((item) => (
             <Link
-              href={item.href}
               key={item.id}
-              className={`flex items-center gap-2 px-2 py-2 rounded-md cursor-pointer ${item.href === pathName ? "bg-[#EEF2FF] " : ""} ${
+              href={item.href}
+              onClick={() => onNavigate?.()}
+              className={`flex items-center gap-2 px-2 py-2 rounded-md cursor-pointer hover:bg-gray-100 ${
                 isCollapsed ? "justify-center" : ""
+              } ${
+                pathname === item.href ? "bg-[#EFF6FF]" : ""
               }`}
             >
               <Image src={item.icon} alt={item.label} width={20} height={20} />
 
               {isExpanded && (
                 <span
-                  className={`text-[14px] font-medium  ${item.href === pathName ? "text-[#0070FF]" : "text-[#64748B] "}`}
+                  className={`text-[14px] font-medium ${
+                    pathname === item.href ? "text-[#2563EB]" : "text-[#64748B]"
+                  }`}
                 >
                   {item.label}
                 </span>
