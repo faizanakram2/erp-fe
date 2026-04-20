@@ -1,7 +1,7 @@
 import Image from "next/image";
 export const Navbar = () => {
   return (
-    <div className="h-[79px]  bg-[#FFFFFF] flex items-center justify-between px-6 shadow-sm">
+    <div className="h-[79px]  bg-[#FFFFFF] flex items-center justify-between px-6 border-b border-[#EAEAEA]">
       {/* logo and heading */}
 
       <div className=" flex gap-2 items-center ">
