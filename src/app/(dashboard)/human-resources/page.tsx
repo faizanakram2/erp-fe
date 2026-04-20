@@ -1,5 +1,5 @@
-import HumanResources from "@/components/human-resources/HumanResources";
+const HumanResourcesPage = () => {
+  return <div>page</div>;
+};
 
-export default function HumanResourcesPage() {
-  return <HumanResources />;
-}
+export default HumanResourcesPage;
