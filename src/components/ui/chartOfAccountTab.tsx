@@ -1,5 +1,8 @@
-// app/page.tsx
+"use client";
+import { useState } from "react";
+import ManageAssestsModel from "../models/ManageAssestsModel";
 export default function ChartOfAccountTab() {
+  const [isModelOpen, setIsModelOpen] = useState(false);
   const assets = [
     { label: "Cash in Hand", value: "PKR 2.5M" },
     { label: "Bank - HBL Main", value: "PKR 45.0M" },
@@ -15,11 +18,17 @@ export default function ChartOfAccountTab() {
   return (
     <main className="min-h-screen bg-white p-6">
       <div className="flex flex-wrap items-start gap-16">
+        {isModelOpen && (
+          <ManageAssestsModel onClose={() => setIsModelOpen(false)} />
+        )}
         {/* Assets Card */}
         <section className="w-[375px] h-full rounded-[17px] bg-[#F2F2F2] px-3 flex flex-col gap-3 py-6">
           <div className="mb-3 flex items-center justify-between">
             <h2 className="text-[16px] font-normal text-[#000000]">Assets</h2>
-            <button className="h-[28px] w-[111px] rounded-[7px] bg-[#000000] flex items-center justify-center text-[10px] font-normal text-white">
+            <button
+              onClick={() => setIsModelOpen(true)}
+              className="cursor-pointer h-[28px] w-[111px] rounded-[7px] bg-[#000000] flex items-center justify-center text-[10px] font-normal text-white"
+            >
               Manage Assets
             </button>
           </div>
