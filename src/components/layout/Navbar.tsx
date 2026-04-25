@@ -1,10 +1,36 @@
 import Image from "next/image";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
 type NavbarProps = {
   onMenuClick?: () => void;
 };
 
 export const Navbar = ({ onMenuClick }: NavbarProps) => {
+  const [pageName, setPageName] = useState<string>("");
+  const pathName = usePathname();
+  useEffect(() => {
+    if (pathName === "/") {
+      setPageName("Dashboards");
+    } else if (pathName === "/land-planning") {
+      setPageName("Land Planning");
+    } else if (pathName === "/construction") {
+      setPageName("Construction");
+    } else if (pathName === "/sales-crm") {
+      setPageName("Sales & CRM");
+    } else if (pathName === "/finance") {
+      setPageName("Finance");
+    } else if (pathName === "/human-resources") {
+      setPageName("Human Resources");
+    } else if (pathName === "/inventory") {
+      setPageName("Inventory");
+    } else if (pathName === "/reports") {
+      setPageName("Reports");
+    } else if (pathName === "/settings") {
+      setPageName("Settings");
+    }
+  }, [pathName]);
+
   return (
     <div className="h-[56px] min-h-[56px] sm:h-[79px] sm:min-h-[79px] bg-[#FFFFFF] flex items-center justify-between px-3 sm:px-6 shadow-sm shrink-0">
       {/* logo and heading */}
@@ -26,7 +52,7 @@ export const Navbar = ({ onMenuClick }: NavbarProps) => {
         </button>
 
         <h1 className="font-semibold text-[16px] sm:text-[20px] text-[#081021] truncate">
-          Dashboards
+          {pageName}
         </h1>
       </div>
       {/* theme + notification */}
