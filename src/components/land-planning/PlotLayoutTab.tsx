@@ -19,9 +19,14 @@ const INITIAL_BLOCKS: PlotLayoutBlockData[] = [
   { id: "c", name: "Block C", ...BLOCK_LAYOUT_STATS },
 ];
 
+const ADD_BLOCK_NAME_OPTIONS = ["Block D", "Block E", "Block F", "Block G", "Block H"] as const;
+const TOTAL_PLOTS_DROPDOWN_OPTIONS = ["10", "20", "30", "40", "50", "60", "80", "100"] as const;
+
 type PlotLayoutTabProps = {
   propertyNames: string[];
 };
+
+const GREEN_VALLEY_PHASE_1 = "Green Valley Phase 1" as const;
 
 export default function PlotLayoutTab({ propertyNames }: PlotLayoutTabProps) {
   const [blocks, setBlocks] = useState<PlotLayoutBlockData[]>(INITIAL_BLOCKS);
@@ -35,6 +40,66 @@ export default function PlotLayoutTab({ propertyNames }: PlotLayoutTabProps) {
   const [updateSold, setUpdateSold] = useState("");
   const [updateAvailable, setUpdateAvailable] = useState("");
   const [updateReserved, setUpdateReserved] = useState("");
+
+  const [addBlockNameValue, setAddBlockNameValue] = useState("");
+  const [addBlockTotalPlotsValue, setAddBlockTotalPlotsValue] = useState("");
+  const [addBlockNameSelectOpen, setAddBlockNameSelectOpen] = useState(false);
+  const [addBlockTotalPlotsSelectOpen, setAddBlockTotalPlotsSelectOpen] =
+    useState(false);
+  const addBlockNameRootRef = useRef<HTMLDivElement>(null);
+  const addBlockTotalPlotsRootRef = useRef<HTMLDivElement>(null);
+
+  const [plotBlockToast, setPlotBlockToast] = useState<{
+    message: string;
+    variant: "success" | "error";
+  } | null>(null);
+
+  const submitAddBlock = () => {
+    if (!addBlockNameValue.trim() || !addBlockTotalPlotsValue) {
+      setPlotBlockToast({
+        message: "Please select a block name and total plots.",
+        variant: "error",
+      });
+      return;
+    }
+    if (blocks.some((b) => b.name === addBlockNameValue)) {
+      setPlotBlockToast({
+        message: "A block with this name already exists.",
+        variant: "error",
+      });
+      return;
+    }
+    const totalPlots = Number.parseInt(addBlockTotalPlotsValue, 10);
+    if (!Number.isFinite(totalPlots) || totalPlots < 1) {
+      setPlotBlockToast({
+        message: "Please select a valid total plots value.",
+        variant: "error",
+      });
+      return;
+    }
+
+    const id =
+      typeof crypto !== "undefined" && "randomUUID" in crypto
+        ? crypto.randomUUID()
+        : `block-${Date.now()}`;
+
+    setBlocks((prev) => [
+      ...prev,
+      {
+        id,
+        name: addBlockNameValue,
+        totalPlots,
+        sold: 0,
+        available: totalPlots,
+        reserved: 0,
+      },
+    ]);
+    setIsAddBlockOpen(false);
+    setPlotBlockToast({
+      message: "New block added successfully",
+      variant: "success",
+    });
+  };
 
   const openUpdateBlockPanel = () => {
     setUpdateBlockId("");
@@ -85,7 +150,7 @@ export default function PlotLayoutTab({ propertyNames }: PlotLayoutTabProps) {
 
   const options = useMemo(() => {
     const unique = [...new Set(propertyNames.filter(Boolean))];
-    return unique.length > 0 ? unique : ["Green Valley Phase 1"];
+    return unique.length > 0 ? unique : [GREEN_VALLEY_PHASE_1];
   }, [propertyNames]);
 
   const [selectedProperty, setSelectedProperty] = useState("");
@@ -122,6 +187,57 @@ export default function PlotLayoutTab({ propertyNames }: PlotLayoutTabProps) {
   }, []);
 
   useEffect(() => {
+    if (isAddBlockOpen) {
+      setAddBlockNameValue("");
+      setAddBlockTotalPlotsValue("");
+      setAddBlockNameSelectOpen(false);
+      setAddBlockTotalPlotsSelectOpen(false);
+    }
+  }, [isAddBlockOpen]);
+
+  useEffect(() => {
+    if (!plotBlockToast) return;
+    const t = window.setTimeout(() => setPlotBlockToast(null), 4000);
+    return () => window.clearTimeout(t);
+  }, [plotBlockToast]);
+
+  useEffect(() => {
+    if (!addBlockNameSelectOpen && !addBlockTotalPlotsSelectOpen) return;
+    const close = (e: MouseEvent | TouchEvent) => {
+      const target = e.target as Node;
+      if (
+        addBlockNameSelectOpen &&
+        !addBlockNameRootRef.current?.contains(target)
+      ) {
+        setAddBlockNameSelectOpen(false);
+      }
+      if (
+        addBlockTotalPlotsSelectOpen &&
+        !addBlockTotalPlotsRootRef.current?.contains(target)
+      ) {
+        setAddBlockTotalPlotsSelectOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", close);
+    document.addEventListener("touchstart", close, { passive: true });
+    return () => {
+      document.removeEventListener("mousedown", close);
+      document.removeEventListener("touchstart", close);
+    };
+  }, [addBlockNameSelectOpen, addBlockTotalPlotsSelectOpen]);
+
+  useEffect(() => {
+    if (!isAddBlockOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      setAddBlockNameSelectOpen(false);
+      setAddBlockTotalPlotsSelectOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [isAddBlockOpen]);
+
+  useEffect(() => {
     const lockScroll =
       isAddBlockOpen || isUpdateBlockOpen || isUploadPlotLayoutOpen;
     if (!lockScroll) return;
@@ -149,9 +265,34 @@ export default function PlotLayoutTab({ propertyNames }: PlotLayoutTabProps) {
 
   return (
     <div className="mt-3 flex min-h-0 flex-col gap-5 sm:mt-5 sm:gap-6">
+      {plotBlockToast ? (
+        <div
+          role="status"
+          aria-live="polite"
+          className={`rounded-xl border px-4 py-3 text-[14px] sm:text-[15px] ${
+            plotBlockToast.variant === "success"
+              ? "border-[#A7F3D0] bg-[#ECFDF5] text-[#065F46]"
+              : "border-[#FECACA] bg-[#FEF2F2] text-[#991B1B]"
+          }`}
+        >
+          {plotBlockToast.message}
+        </div>
+      ) : null}
+
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-        <h2 className="text-[16px] font-semibold leading-snug text-[#0F172A] sm:text-[18px] md:text-[20px]">
-          Plot Layout{headingSuffix}
+        <h2 className="inline-flex max-w-full min-w-0 flex-nowrap items-baseline gap-1 whitespace-nowrap text-[16px] font-semibold leading-snug text-[#0F172A] sm:text-[18px] md:text-[20px]">
+          <span className="shrink-0">Plot Layout</span>
+          {selectedProperty ? (
+            <span
+              className={`min-w-0 truncate ${
+                selectedProperty === GREEN_VALLEY_PHASE_1
+                  ? "text-[13px] leading-snug sm:text-[15px] md:text-[16px]"
+                  : ""
+              }`}
+            >
+              {headingSuffix}
+            </span>
+          ) : null}
         </h2>
         <div className="relative w-full shrink-0 sm:w-[min(100%,280px)]" ref={propertySelectRootRef}>
           <button
@@ -160,14 +301,22 @@ export default function PlotLayoutTab({ propertyNames }: PlotLayoutTabProps) {
             aria-expanded={propertySelectOpen}
             aria-controls="plot-property-listbox"
             onClick={() => setPropertySelectOpen((o) => !o)}
-            className={`flex h-[44px] w-full items-center justify-between gap-2 rounded-[10px] border bg-white py-2 pl-4 pr-3 text-left text-[14px] text-[#111827] outline-none transition-[border-color,box-shadow] sm:text-[15px] ${
+            className={`flex h-[44px] w-full min-w-0 items-center justify-between gap-2 rounded-[10px] border bg-white py-2 pl-4 pr-3 text-left text-[14px] text-[#111827] outline-none transition-[border-color,box-shadow] sm:text-[15px] ${
               propertySelectOpen
-                ? "border-[#1D75F8] shadow-[0_0_0_3px_rgba(29,117,248,0.15)]"
-                : "border-[#BFDBFE]"
+                ? "border-[#1458CC] shadow-[0_0_0_3px_rgba(20,88,204,0.15)]"
+                : "border-[#60A5FA]"
             }`}
           >
-            <span>{selectedProperty || "Select Property"}</span>
-            <span className="shrink-0 text-[#1D75F8]">
+            <span
+              className={`min-w-0 flex-1 truncate text-left ${
+                selectedProperty === GREEN_VALLEY_PHASE_1
+                  ? "text-[13px] sm:text-[14px]"
+                  : ""
+              }`}
+            >
+              {selectedProperty || "Select Property"}
+            </span>
+            <span className="shrink-0 text-[#1458CC]">
               <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden>
                 <path
                   d="M5 7.5L10 12.5L15 7.5"
@@ -196,10 +345,14 @@ export default function PlotLayoutTab({ propertyNames }: PlotLayoutTabProps) {
                       setSelectedProperty(name);
                       setPropertySelectOpen(false);
                     }}
-                    className={`w-full px-4 py-3 text-left text-[14px] transition-colors sm:text-[15px] ${
+                    className={`w-full truncate whitespace-nowrap px-4 py-3 text-left transition-colors ${
+                      name === GREEN_VALLEY_PHASE_1
+                        ? "text-[13px] sm:text-[14px]"
+                        : "text-[14px] sm:text-[15px]"
+                    } ${
                       selectedProperty === name
-                        ? "bg-[#1D75F8] text-white"
-                        : "bg-white text-[#111827] hover:bg-[#1D75F8] hover:text-white"
+                        ? "bg-[#1458CC] text-white"
+                        : "bg-white text-[#111827] hover:bg-[#1458CC] hover:text-white"
                     }`}
                   >
                     {name}
@@ -235,7 +388,7 @@ export default function PlotLayoutTab({ propertyNames }: PlotLayoutTabProps) {
               </div>
               <div className="flex items-center justify-between gap-2">
                 <dt className="font-normal text-[#64748B]">Available</dt>
-                <dd className="font-semibold text-[#2563EB] tabular-nums">
+                <dd className="font-semibold text-[#1D4ED8] tabular-nums">
                   {block.available}
                 </dd>
               </div>
@@ -312,7 +465,7 @@ export default function PlotLayoutTab({ propertyNames }: PlotLayoutTabProps) {
         <button
           type="button"
           onClick={openUpdateBlockPanel}
-          className="inline-flex h-11 min-w-[140px] items-center justify-center rounded-[10px] bg-[#1D75F8] px-5 text-[14px] font-medium text-white shadow-sm transition-colors hover:bg-[#1569E8] active:bg-[#145FDB] sm:h-12 sm:text-[15px]"
+          className="inline-flex h-11 min-w-[140px] items-center justify-center rounded-[10px] bg-[#1458CC] px-5 text-[14px] font-medium text-white shadow-sm transition-colors hover:bg-[#124A9E] active:bg-[#0F3D82] sm:h-12 sm:text-[15px]"
         >
           Upload Block
         </button>
@@ -357,7 +510,7 @@ export default function PlotLayoutTab({ propertyNames }: PlotLayoutTabProps) {
                     id="update-block-select"
                     value={updateBlockId}
                     onChange={(e) => syncUpdateFormFromBlockId(e.target.value)}
-                    className={`h-[52px] w-full cursor-pointer appearance-none rounded-[10px] border border-[#E5E7EB] bg-white py-2 pl-4 pr-11 text-[16px] outline-none transition-[box-shadow,border-color] focus:border-[#1D75F8] focus:ring-2 focus:ring-[#1D75F8]/20 sm:h-[56px] sm:px-5 sm:text-[17px] ${
+                    className={`h-[52px] w-full cursor-pointer appearance-none rounded-[10px] border border-[#E5E7EB] bg-white py-2 pl-4 pr-11 text-[16px] outline-none transition-[box-shadow,border-color] focus:border-[#1458CC] focus:ring-2 focus:ring-[#1458CC]/20 sm:h-[56px] sm:px-5 sm:text-[17px] ${
                       updateBlockId ? "font-medium text-[#111827]" : "text-[#A3A3A3]"
                     }`}
                   >
@@ -370,7 +523,7 @@ export default function PlotLayoutTab({ propertyNames }: PlotLayoutTabProps) {
                       </option>
                     ))}
                   </select>
-                  <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#1D75F8] sm:right-5">
+                  <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#1458CC] sm:right-5">
                     <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden>
                       <path
                         d="M5 7.5L10 12.5L15 7.5"
@@ -399,7 +552,7 @@ export default function PlotLayoutTab({ propertyNames }: PlotLayoutTabProps) {
                     value={updateSold}
                     onChange={(e) => setUpdateSold(e.target.value)}
                     placeholder="e.g. 45"
-                    className="h-[52px] w-full rounded-[10px] border border-[#E5E7EB] bg-white px-4 text-[16px] text-[#111827] outline-none placeholder:text-[#A3A3A3] focus:border-[#1D75F8] focus:ring-2 focus:ring-[#1D75F8]/20 sm:h-[56px] sm:px-5 sm:text-[17px]"
+                    className="h-[52px] w-full rounded-[10px] border border-[#E5E7EB] bg-white px-4 text-[16px] text-[#111827] outline-none placeholder:text-[#A3A3A3] focus:border-[#1458CC] focus:ring-2 focus:ring-[#1458CC]/20 sm:h-[56px] sm:px-5 sm:text-[17px]"
                   />
                 </div>
                 <div className="space-y-2">
@@ -416,7 +569,7 @@ export default function PlotLayoutTab({ propertyNames }: PlotLayoutTabProps) {
                     value={updateAvailable}
                     onChange={(e) => setUpdateAvailable(e.target.value)}
                     placeholder="e.g. 23"
-                    className="h-[52px] w-full rounded-[10px] border border-[#E5E7EB] bg-white px-4 text-[16px] text-[#111827] outline-none placeholder:text-[#A3A3A3] focus:border-[#1D75F8] focus:ring-2 focus:ring-[#1D75F8]/20 sm:h-[56px] sm:px-5 sm:text-[17px]"
+                    className="h-[52px] w-full rounded-[10px] border border-[#E5E7EB] bg-white px-4 text-[16px] text-[#111827] outline-none placeholder:text-[#A3A3A3] focus:border-[#1458CC] focus:ring-2 focus:ring-[#1458CC]/20 sm:h-[56px] sm:px-5 sm:text-[17px]"
                   />
                 </div>
               </div>
@@ -435,7 +588,7 @@ export default function PlotLayoutTab({ propertyNames }: PlotLayoutTabProps) {
                   value={updateReserved}
                   onChange={(e) => setUpdateReserved(e.target.value)}
                   placeholder="e.g. 45"
-                  className="h-[52px] w-full rounded-[10px] border border-[#E5E7EB] bg-white px-4 text-[16px] text-[#111827] outline-none placeholder:text-[#A3A3A3] focus:border-[#1D75F8] focus:ring-2 focus:ring-[#1D75F8]/20 sm:h-[56px] sm:px-5 sm:text-[17px]"
+                  className="h-[52px] w-full rounded-[10px] border border-[#E5E7EB] bg-white px-4 text-[16px] text-[#111827] outline-none placeholder:text-[#A3A3A3] focus:border-[#1458CC] focus:ring-2 focus:ring-[#1458CC]/20 sm:h-[56px] sm:px-5 sm:text-[17px]"
                 />
               </div>
             </div>
@@ -451,7 +604,7 @@ export default function PlotLayoutTab({ propertyNames }: PlotLayoutTabProps) {
               <button
                 type="button"
                 onClick={submitUpdateBlock}
-                className="h-11 rounded-lg bg-[#1D75F8] px-5 text-[14px] font-semibold text-white transition-colors hover:bg-[#1569E8] sm:h-12 sm:px-6 sm:text-[15px]"
+                className="h-11 rounded-lg bg-[#1458CC] px-5 text-[14px] font-semibold text-white transition-colors hover:bg-[#124A9E] sm:h-12 sm:px-6 sm:text-[15px]"
               >
                 Add New Land
               </button>
@@ -541,7 +694,7 @@ export default function PlotLayoutTab({ propertyNames }: PlotLayoutTabProps) {
               <button
                 type="button"
                 onClick={() => uploadPlotLayoutInputRef.current?.click()}
-                className="h-11 rounded-lg bg-[#1D75F8] px-5 text-[14px] font-semibold text-white transition-colors hover:bg-[#1569E8] sm:h-12 sm:px-6 sm:text-[15px]"
+                className="h-11 rounded-lg bg-[#1458CC] px-5 text-[14px] font-semibold text-white transition-colors hover:bg-[#124A9E] sm:h-12 sm:px-6 sm:text-[15px]"
               >
                 upload Layout
               </button>
@@ -576,7 +729,7 @@ export default function PlotLayoutTab({ propertyNames }: PlotLayoutTabProps) {
                 >
                   Add New Plot Block
                 </h3>
-                <span className="rounded-full bg-[#EFF6FF] px-2.5 py-0.5 text-[11px] font-semibold text-[#2563EB] sm:px-3 sm:py-1 sm:text-[12px]">
+                <span className="rounded-full bg-[#DBEAFE] px-2.5 py-0.5 text-[11px] font-semibold text-[#1D4ED8] sm:px-3 sm:py-1 sm:text-[12px]">
                   New
                 </span>
               </div>
@@ -588,25 +741,76 @@ export default function PlotLayoutTab({ propertyNames }: PlotLayoutTabProps) {
             <div className="mt-5 space-y-4 sm:mt-6">
               <div className="space-y-2">
                 <label className="text-[14px] font-semibold leading-none text-[#111827] sm:text-[15px]">
-                  Block Name
+                  Add Block Name
                 </label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder="e.g. Block D"
-                    className="h-[52px] w-full rounded-xl border border-[#E5E7EB] px-4 pr-11 text-[16px] text-[#111827] outline-none placeholder:text-[#A3A3A3] sm:h-[56px] sm:px-5 sm:text-[17px]"
-                  />
-                  <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#1677FF] sm:right-5">
-                    <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden>
-                      <path
-                        d="M5 7.5L10 12.5L15 7.5"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </span>
+                <div className="relative" ref={addBlockNameRootRef}>
+                  <button
+                    type="button"
+                    aria-haspopup="listbox"
+                    aria-expanded={addBlockNameSelectOpen}
+                    aria-controls="add-block-name-listbox"
+                    onClick={() => {
+                      setAddBlockNameSelectOpen((o) => !o);
+                      setAddBlockTotalPlotsSelectOpen(false);
+                    }}
+                    className={`flex h-[52px] w-full items-center justify-between gap-2 rounded-xl border bg-white py-2 pl-4 pr-3 text-left text-[16px] outline-none transition-[border-color,box-shadow] sm:h-[56px] sm:px-5 sm:text-[17px] ${
+                      addBlockNameSelectOpen
+                        ? "border-[#1458CC] shadow-[0_0_0_3px_rgba(20,88,204,0.15)]"
+                        : "border-[#E5E7EB]"
+                    }`}
+                  >
+                    <span
+                      className={`min-w-0 flex-1 truncate text-left ${
+                        addBlockNameValue ? "font-medium text-[#111827]" : "text-[#A3A3A3]"
+                      }`}
+                    >
+                      {addBlockNameValue || "e.g. Block D"}
+                    </span>
+                    <span className="shrink-0 text-[#1458CC]">
+                      <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden>
+                        <path
+                          d="M5 7.5L10 12.5L15 7.5"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </span>
+                  </button>
+
+                  {addBlockNameSelectOpen ? (
+                    <ul
+                      id="add-block-name-listbox"
+                      role="listbox"
+                      className="absolute left-0 right-0 top-full z-[60] mt-1 max-h-[220px] overflow-y-auto overflow-x-hidden rounded-xl border border-[#D1D5DB] bg-white shadow-[0_10px_30px_rgba(15,23,42,0.12)]"
+                    >
+                      {ADD_BLOCK_NAME_OPTIONS.map((name) => (
+                        <li
+                          key={name}
+                          role="presentation"
+                          className="border-b border-[#F0F2F5] last:border-b-0"
+                        >
+                          <button
+                            type="button"
+                            role="option"
+                            aria-selected={addBlockNameValue === name}
+                            onClick={() => {
+                              setAddBlockNameValue(name);
+                              setAddBlockNameSelectOpen(false);
+                            }}
+                            className={`w-full truncate px-4 py-3 text-left text-[15px] transition-colors sm:text-[16px] ${
+                              addBlockNameValue === name
+                                ? "bg-[#1458CC] text-white"
+                                : "bg-white text-[#111827] hover:bg-[#1458CC] hover:text-white"
+                            }`}
+                          >
+                            {name}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
                 </div>
               </div>
 
@@ -614,23 +818,76 @@ export default function PlotLayoutTab({ propertyNames }: PlotLayoutTabProps) {
                 <label className="text-[14px] font-semibold leading-none text-[#111827] sm:text-[15px]">
                   Total Plots
                 </label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder="e.g. 50"
-                    className="h-[52px] w-full rounded-xl border border-[#E5E7EB] px-4 pr-11 text-[16px] text-[#111827] outline-none placeholder:text-[#A3A3A3] sm:h-[56px] sm:px-5 sm:text-[17px]"
-                  />
-                  <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#1677FF] sm:right-5">
-                    <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden>
-                      <path
-                        d="M5 7.5L10 12.5L15 7.5"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </span>
+                <div className="relative" ref={addBlockTotalPlotsRootRef}>
+                  <button
+                    type="button"
+                    aria-haspopup="listbox"
+                    aria-expanded={addBlockTotalPlotsSelectOpen}
+                    aria-controls="add-block-total-plots-listbox"
+                    onClick={() => {
+                      setAddBlockTotalPlotsSelectOpen((o) => !o);
+                      setAddBlockNameSelectOpen(false);
+                    }}
+                    className={`flex h-[52px] w-full items-center justify-between gap-2 rounded-xl border bg-white py-2 pl-4 pr-3 text-left text-[16px] outline-none transition-[border-color,box-shadow] sm:h-[56px] sm:px-5 sm:text-[17px] ${
+                      addBlockTotalPlotsSelectOpen
+                        ? "border-[#1458CC] shadow-[0_0_0_3px_rgba(20,88,204,0.15)]"
+                        : "border-[#E5E7EB]"
+                    }`}
+                  >
+                    <span
+                      className={`min-w-0 flex-1 truncate text-left tabular-nums ${
+                        addBlockTotalPlotsValue
+                          ? "font-medium text-[#111827]"
+                          : "text-[#A3A3A3]"
+                      }`}
+                    >
+                      {addBlockTotalPlotsValue || "e.g. 50"}
+                    </span>
+                    <span className="shrink-0 text-[#1458CC]">
+                      <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden>
+                        <path
+                          d="M5 7.5L10 12.5L15 7.5"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </span>
+                  </button>
+
+                  {addBlockTotalPlotsSelectOpen ? (
+                    <ul
+                      id="add-block-total-plots-listbox"
+                      role="listbox"
+                      className="absolute left-0 right-0 top-full z-[60] mt-1 max-h-[220px] overflow-y-auto overflow-x-hidden rounded-xl border border-[#D1D5DB] bg-white shadow-[0_10px_30px_rgba(15,23,42,0.12)]"
+                    >
+                      {TOTAL_PLOTS_DROPDOWN_OPTIONS.map((n) => (
+                        <li
+                          key={n}
+                          role="presentation"
+                          className="border-b border-[#F0F2F5] last:border-b-0"
+                        >
+                          <button
+                            type="button"
+                            role="option"
+                            aria-selected={addBlockTotalPlotsValue === n}
+                            onClick={() => {
+                              setAddBlockTotalPlotsValue(n);
+                              setAddBlockTotalPlotsSelectOpen(false);
+                            }}
+                            className={`w-full px-4 py-3 text-left text-[15px] tabular-nums transition-colors sm:text-[16px] ${
+                              addBlockTotalPlotsValue === n
+                                ? "bg-[#1458CC] text-white"
+                                : "bg-white text-[#111827] hover:bg-[#1458CC] hover:text-white"
+                            }`}
+                          >
+                            {n}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
                 </div>
               </div>
             </div>
@@ -645,7 +902,8 @@ export default function PlotLayoutTab({ propertyNames }: PlotLayoutTabProps) {
               </button>
               <button
                 type="button"
-                className="h-11 rounded-lg bg-[#1D75F8] px-5 text-[14px] font-semibold text-white transition-colors hover:bg-[#1569E8] sm:h-12 sm:px-6 sm:text-[15px]"
+                onClick={submitAddBlock}
+                className="h-11 rounded-lg bg-[#1458CC] px-5 text-[14px] font-semibold text-white transition-colors hover:bg-[#124A9E] sm:h-12 sm:px-6 sm:text-[15px]"
               >
                 Add New Land
               </button>

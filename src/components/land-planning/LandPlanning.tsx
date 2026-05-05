@@ -120,8 +120,8 @@ const INITIAL_LAND_RECORDS: LandRecord[] = [
 ];
 
 const statusBadgeStyles: Record<LandRecord["status"], string> = {
-  Developed: "bg-[#74C7AF] text-white",
-  Planning: "bg-[#779AF3] text-white",
+  Developed: "bg-[#047857] text-white",
+  Planning: "bg-[#1D4ED8] text-white",
 };
 
 const LEGAL_DOCUMENTS = [
@@ -149,6 +149,8 @@ const RELATED_LAND_PROPERTY_OPTIONS = [
   "Royal Palm Estate",
   "Sunrise Heights",
 ] as const;
+
+const GREEN_VALLEY_PHASE_1 = "Green Valley Phase 1" as const;
 
 const LAND_ACTION_MENU_WIDTH = 168;
 const LAND_ACTION_MENU_VIEW_MARGIN = 8;
@@ -667,10 +669,13 @@ export default function LandPlanning() {
         <div className="shrink-0 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4 px-3 pt-4 pb-2 sm:px-6 sm:pt-6">
           <div className="flex min-w-0 flex-col gap-1.5 sm:gap-2">
             <div className="flex flex-wrap items-center gap-2 gap-y-1">
-              <h1 className="min-w-0 text-[17px] leading-snug sm:text-[22px] md:text-[28px] lg:text-[32px] font-semibold text-[#0F172A]">
+              <h1 className="min-w-0 text-[13px] leading-snug sm:text-[16px] md:text-[20px] lg:text-[24px] font-semibold text-[#0F172A]">
                 Land &amp; Planning Management
               </h1>
-              <span className="shrink-0 rounded-full bg-[#EAF2FF] px-2.5 py-0.5 text-[11px] sm:px-3 sm:py-1 sm:text-[12px] md:text-[14px] font-semibold text-[#2563EB]">
+              <span
+                title="Add New Land"
+                className="shrink-0 rounded-full bg-[#DBEAFE] px-2.5 py-0.5 text-[12px] font-semibold leading-none text-[#1D4ED8] sm:px-3 sm:py-1 sm:text-[14px]"
+              >
                 New
               </span>
             </div>
@@ -687,7 +692,7 @@ export default function LandPlanning() {
               setDevStatus(null);
               setIsAddLandOpen(true);
             }}
-            className="inline-flex w-full sm:w-auto touch-manipulation items-center justify-center gap-2 rounded-[12px] bg-[#1D75F8] px-4 sm:px-6 py-2.5 sm:py-3 text-[14px] sm:text-[16px] md:text-[18px] font-medium text-white min-h-[44px] sm:min-h-0 sm:h-[48px] shrink-0"
+            className="inline-flex w-full sm:w-auto touch-manipulation items-center justify-center gap-2 rounded-[12px] bg-[#1458CC] px-4 sm:px-6 py-2.5 sm:py-3 text-[14px] sm:text-[16px] md:text-[18px] font-medium text-white min-h-[44px] sm:min-h-0 sm:h-[48px] shrink-0"
           >
             <span className="text-[18px] sm:text-[20px] leading-none">+</span>
             Add New Land
@@ -723,27 +728,13 @@ export default function LandPlanning() {
 
             {activeTab === TAB_LAND_RECORD ? (
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3 lg:shrink-0">
-                <div className="flex h-[44px] w-full min-w-0 lg:w-[min(100%,420px)] items-center gap-2 rounded-[10px] border border-[#CBD5E1] px-3 sm:gap-3 sm:px-4">
-                  <svg
-                    className="shrink-0"
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    aria-hidden
-                  >
-                    <path
-                      d="M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19Z"
-                      stroke="#64748B"
-                      strokeWidth="2"
-                    />
-                    <path d="M21 21L16.65 16.65" stroke="#64748B" strokeWidth="2" />
-                  </svg>
+                <div className="flex h-[44px] w-full min-w-0 items-center rounded-2xl border border-[#60A5FA] bg-white px-4 sm:h-[48px] sm:px-5 md:w-[min(100%,520px)] lg:w-[min(100%,720px)]">
                   <input
                     type="search"
                     enterKeyHint="search"
-                    placeholder="Search"
-                    className="min-w-0 flex-1 border-none bg-transparent text-[16px] sm:text-[15px] md:text-[16px] lg:text-[18px] text-[#334155] outline-none placeholder:text-[#94A3B8]"
+                    placeholder="Search Property......"
+                    aria-label="Search property"
+                    className="h-full min-w-0 w-full border-none bg-transparent text-[15px] text-[#334155] outline-none placeholder:text-[#9CA3AF] sm:text-[16px]"
                   />
                 </div>
 
@@ -781,7 +772,13 @@ export default function LandPlanning() {
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0 pr-1">
-                    <p className="text-[15px] leading-snug font-semibold text-[#0F172A] break-words sm:text-[16px]">
+                    <p
+                      className={`min-w-0 font-semibold leading-snug text-[#0F172A] ${
+                        record.propertyName === GREEN_VALLEY_PHASE_1
+                          ? "truncate whitespace-nowrap text-[14px] sm:text-[15px]"
+                          : "break-words text-[15px] sm:text-[16px]"
+                      }`}
+                    >
                       {record.propertyName}
                     </p>
                     <p className="mt-1 text-[11px] text-[#94A3B8] sm:text-[12px]">
@@ -799,7 +796,7 @@ export default function LandPlanning() {
                     aria-haspopup="menu"
                     aria-controls="land-record-action-menu"
                     onClick={() => toggleLandActionMenu(record.id, "card")}
-                    className="touch-manipulation shrink-0 rounded-lg px-2 py-1 text-[18px] leading-none text-[#64748B] outline-none hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-[#1D75F8]/30 active:bg-slate-200 sm:text-[20px]"
+                    className="touch-manipulation shrink-0 rounded-lg px-2 py-1 text-[18px] leading-none text-[#64748B] outline-none hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-[#1458CC]/30 active:bg-slate-200 sm:text-[20px]"
                     aria-label={`More actions for ${record.propertyName}`}
                   >
                     ⋮
@@ -825,7 +822,7 @@ export default function LandPlanning() {
                     <p className="text-[14px] text-[#64748B] mt-1">
                       {record.totalPlots} Total
                     </p>
-                    <p className="text-[14px] text-[#10B981]">
+                    <p className="text-[14px] text-[#059669]">
                       {record.availablePlots} Available
                     </p>
                   </div>
@@ -887,7 +884,13 @@ export default function LandPlanning() {
                     className="border-b border-[#E2E8F0] align-top"
                   >
                     <td className="px-4 sm:px-6 py-4 sm:py-5">
-                      <p className="text-[14px] sm:text-[16px] md:text-[18px] font-semibold text-[#0F172A]">
+                      <p
+                        className={`max-w-[min(100%,20rem)] font-semibold text-[#0F172A] ${
+                          record.propertyName === GREEN_VALLEY_PHASE_1
+                            ? "truncate whitespace-nowrap text-[13px] sm:text-[15px] md:text-[16px]"
+                            : "text-[14px] sm:text-[16px] md:text-[18px]"
+                        }`}
+                      >
                         {record.propertyName}
                       </p>
                       <p className="text-[12px] sm:text-[14px] md:text-[16px] text-[#94A3B8]">
@@ -904,7 +907,7 @@ export default function LandPlanning() {
                       <p className="text-[12px] sm:text-[14px] md:text-[16px] text-[#64748B]">
                         {record.totalPlots} Total
                       </p>
-                      <p className="text-[12px] sm:text-[14px] md:text-[16px] text-[#10B981]">
+                      <p className="text-[12px] sm:text-[14px] md:text-[16px] text-[#059669]">
                         {record.availablePlots} Available
                       </p>
                     </td>
@@ -930,7 +933,7 @@ export default function LandPlanning() {
                         aria-haspopup="menu"
                         aria-controls="land-record-action-menu"
                         onClick={() => toggleLandActionMenu(record.id, "table")}
-                        className="touch-manipulation rounded-lg px-2 py-1 text-[18px] leading-none text-[#64748B] outline-none hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-[#1D75F8]/30 active:bg-slate-200 sm:text-[22px]"
+                        className="touch-manipulation rounded-lg px-2 py-1 text-[18px] leading-none text-[#64748B] outline-none hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-[#1458CC]/30 active:bg-slate-200 sm:text-[22px]"
                         aria-label={`More actions for ${record.propertyName}`}
                       >
                         ⋮
@@ -951,7 +954,7 @@ export default function LandPlanning() {
           {activeTab === TAB_LEGAL_DOCUMENTS ? (
             <div className="mt-5 px-1 pb-4 sm:mt-6 sm:px-0 sm:pb-6">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-                <h2 className="text-[34px] font-semibold leading-tight text-[#0F172A]">
+                <h2 className="text-[20px] font-semibold leading-tight text-[#0F172A] sm:text-[24px] md:text-[26px]">
                   Legal Documents
                 </h2>
                 <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center sm:gap-2">
@@ -962,16 +965,22 @@ export default function LandPlanning() {
                       aria-expanded={legalDocsPropertyOpen}
                       aria-controls="legal-docs-property-listbox"
                       onClick={() => setLegalDocsPropertyOpen((o) => !o)}
-                      className={`flex h-[44px] w-full items-center justify-between gap-2 rounded-[10px] border bg-white py-2 pl-4 pr-3 text-left text-[15px] outline-none transition-[border-color,box-shadow] ${
+                      className={`flex h-[44px] w-full min-w-0 items-center justify-between gap-2 rounded-[10px] border bg-white py-2 pl-4 pr-3 text-left text-[15px] outline-none transition-[border-color,box-shadow] ${
                         legalDocsPropertyOpen
-                          ? "border-[#1D75F8] shadow-[0_0_0_3px_rgba(29,117,248,0.15)]"
-                          : "border-[#93C5FD]"
+                          ? "border-[#1458CC] shadow-[0_0_0_3px_rgba(20,88,204,0.15)]"
+                          : "border-[#60A5FA]"
                       }`}
                     >
-                      <span className={legalDocsProperty ? "text-[#111827]" : "text-[#94A3B8]"}>
+                      <span
+                        className={`min-w-0 flex-1 truncate whitespace-nowrap ${
+                          legalDocsProperty === GREEN_VALLEY_PHASE_1
+                            ? "text-[14px] sm:text-[15px]"
+                            : "text-[15px]"
+                        } ${legalDocsProperty ? "text-[#111827]" : "text-[#94A3B8]"}`}
+                      >
                         {legalDocsProperty || "Select Property"}
                       </span>
-                      <span className="shrink-0 text-[#1D75F8]">
+                      <span className="shrink-0 text-[#1458CC]">
                         <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden>
                           <path
                             d="M5 7.5L10 12.5L15 7.5"
@@ -999,10 +1008,14 @@ export default function LandPlanning() {
                                 setLegalDocsProperty(name);
                                 setLegalDocsPropertyOpen(false);
                               }}
-                              className={`w-full px-4 py-3 text-left text-[15px] transition-colors ${
+                              className={`w-full truncate whitespace-nowrap px-4 py-3 text-left transition-colors ${
+                                name === GREEN_VALLEY_PHASE_1
+                                  ? "text-[14px] sm:text-[15px]"
+                                  : "text-[15px]"
+                              } ${
                                 legalDocsProperty === name
-                                  ? "bg-[#1D75F8] text-white"
-                                  : "bg-white text-[#4B5563] hover:bg-[#1D75F8] hover:text-white"
+                                  ? "bg-[#1458CC] text-white"
+                                  : "bg-white text-[#4B5563] hover:bg-[#1458CC] hover:text-white"
                               }`}
                             >
                               {name}
@@ -1015,7 +1028,7 @@ export default function LandPlanning() {
                   <button
                     type="button"
                     onClick={() => setIsUploadLegalDocOpen(true)}
-                    className="inline-flex h-[44px] shrink-0 items-center justify-center gap-2 rounded-[10px] bg-[#1D75F8] px-4 text-[14px] font-medium text-white shadow-sm transition-colors hover:bg-[#1569E8] active:bg-[#145FDB]"
+                    className="inline-flex h-[44px] shrink-0 items-center justify-center gap-2 rounded-[10px] bg-[#1458CC] px-4 text-[14px] font-medium text-white shadow-sm transition-colors hover:bg-[#124A9E] active:bg-[#0F3D82]"
                   >
                     <span className="text-[18px] leading-none">+</span>
                     Upload Document
@@ -1122,7 +1135,7 @@ export default function LandPlanning() {
                 >
                   Upload Legal Document
                 </h3>
-                <span className="rounded-full bg-[#EFF6FF] px-2.5 py-0.5 text-[11px] font-semibold text-[#2563EB] sm:px-3 sm:py-1 sm:text-[12px]">
+                <span className="rounded-full bg-[#DBEAFE] px-2.5 py-0.5 text-[11px] font-semibold text-[#1D4ED8] sm:px-3 sm:py-1 sm:text-[12px]">
                   New
                 </span>
               </div>
@@ -1149,14 +1162,14 @@ export default function LandPlanning() {
                   onClick={() => setUploadDocTypeOpen((o) => !o)}
                   className={`flex h-[50px] w-full items-center justify-between gap-2 rounded-[10px] border bg-white py-2 pl-4 pr-10 text-left text-[15px] outline-none transition-[border-color,box-shadow] sm:h-[52px] sm:text-[16px] ${
                     uploadDocTypeOpen
-                      ? "border-[#1D75F8] shadow-[0_0_0_3px_rgba(29,117,248,0.15)]"
+                      ? "border-[#1458CC] shadow-[0_0_0_3px_rgba(20,88,204,0.15)]"
                       : "border-[#E5E7EB]"
                   }`}
                 >
                   <span className={uploadDocType ? "text-[#111827]" : "text-[#A3A3A3]"}>
                     {uploadDocType ?? "Select Document Type"}
                   </span>
-                  <span className="ml-auto shrink-0 text-[#1D75F8]">
+                  <span className="ml-auto shrink-0 text-[#1458CC]">
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden>
                       <path
                         d="M5 7.5L10 12.5L15 7.5"
@@ -1188,8 +1201,8 @@ export default function LandPlanning() {
                           className={`w-full px-4 py-3 text-left text-[15px] transition-colors ${
                             uploadDocType === option ||
                             (!uploadDocType && option === LEGAL_DOC_TYPE_OPTIONS[0])
-                              ? "bg-[#1D75F8] text-white"
-                              : "bg-white text-[#4B5563] hover:bg-[#1D75F8] hover:text-white"
+                              ? "bg-[#1458CC] text-white"
+                              : "bg-white text-[#4B5563] hover:bg-[#1458CC] hover:text-white"
                           }`}
                         >
                           {option}
@@ -1215,14 +1228,14 @@ export default function LandPlanning() {
                   onClick={() => setUploadRelatedPropertyOpen((o) => !o)}
                   className={`flex h-[50px] w-full items-center justify-between gap-2 rounded-[10px] border bg-white py-2 pl-4 pr-10 text-left text-[15px] outline-none transition-[border-color,box-shadow] sm:h-[52px] sm:text-[16px] ${
                     uploadRelatedPropertyOpen
-                      ? "border-[#1D75F8] shadow-[0_0_0_3px_rgba(29,117,248,0.15)]"
+                      ? "border-[#1458CC] shadow-[0_0_0_3px_rgba(20,88,204,0.15)]"
                       : "border-[#E5E7EB]"
                   }`}
                 >
                   <span className={uploadRelatedProperty ? "text-[#111827]" : "text-[#A3A3A3]"}>
                     {uploadRelatedProperty ?? "Related Land Property"}
                   </span>
-                  <span className="ml-auto shrink-0 text-[#1D75F8]">
+                  <span className="ml-auto shrink-0 text-[#1458CC]">
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden>
                       <path
                         d="M5 7.5L10 12.5L15 7.5"
@@ -1254,8 +1267,8 @@ export default function LandPlanning() {
                           className={`w-full px-4 py-3 text-left text-[15px] transition-colors ${
                             uploadRelatedProperty === name ||
                             (!uploadRelatedProperty && name === RELATED_LAND_PROPERTY_OPTIONS[0])
-                              ? "bg-[#1D75F8] text-white"
-                              : "bg-white text-[#4B5563] hover:bg-[#1D75F8] hover:text-white"
+                              ? "bg-[#1458CC] text-white"
+                              : "bg-white text-[#4B5563] hover:bg-[#1458CC] hover:text-white"
                           }`}
                         >
                           {name}
@@ -1306,14 +1319,14 @@ export default function LandPlanning() {
                   onClick={() => setUploadNoteOpen((o) => !o)}
                   className={`flex h-[50px] w-full items-center justify-between gap-2 rounded-[10px] border bg-white py-2 pl-4 pr-10 text-left text-[15px] outline-none transition-[border-color,box-shadow] sm:h-[52px] sm:text-[16px] ${
                     uploadNoteOpen
-                      ? "border-[#1D75F8] shadow-[0_0_0_3px_rgba(29,117,248,0.15)]"
+                      ? "border-[#1458CC] shadow-[0_0_0_3px_rgba(20,88,204,0.15)]"
                       : "border-[#E5E7EB]"
                   }`}
                 >
                   <span className={uploadNote ? "text-[#111827]" : "text-[#A3A3A3]"}>
                     {uploadNote ?? "Additional note about document......."}
                   </span>
-                  <span className="ml-auto shrink-0 text-[#1D75F8]">
+                  <span className="ml-auto shrink-0 text-[#1458CC]">
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden>
                       <path
                         d="M5 7.5L10 12.5L15 7.5"
@@ -1344,8 +1357,8 @@ export default function LandPlanning() {
                           }}
                           className={`w-full px-4 py-3 text-left text-[15px] transition-colors ${
                             uploadNote === note
-                              ? "bg-[#1D75F8] text-white"
-                              : "bg-white text-[#4B5563] hover:bg-[#1D75F8] hover:text-white"
+                              ? "bg-[#1458CC] text-white"
+                              : "bg-white text-[#4B5563] hover:bg-[#1458CC] hover:text-white"
                           }`}
                         >
                           {note}
@@ -1374,7 +1387,7 @@ export default function LandPlanning() {
                   setIsUploadLegalDocOpen(false);
                   setIsUploadSuccessOpen(true);
                 }}
-                className="h-11 rounded-lg bg-[#1D75F8] px-5 text-[14px] font-semibold text-white transition-colors hover:bg-[#1569E8] sm:h-12 sm:px-6 sm:text-[15px]"
+                className="h-11 rounded-lg bg-[#1458CC] px-5 text-[14px] font-semibold text-white transition-colors hover:bg-[#124A9E] sm:h-12 sm:px-6 sm:text-[15px]"
               >
                 Add New Land
               </button>
@@ -1400,7 +1413,7 @@ export default function LandPlanning() {
               <svg width="64" height="64" viewBox="0 0 24 24" fill="none" aria-hidden>
                 <path
                   d="M5 12.5L10 17.5L19 6.5"
-                  stroke="#1D75F8"
+                  stroke="#1458CC"
                   strokeWidth="2.4"
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -1418,7 +1431,7 @@ export default function LandPlanning() {
             <button
               type="button"
               onClick={() => setIsUploadSuccessOpen(false)}
-              className="mt-7 inline-flex h-[62px] w-full items-center justify-center rounded-[22px] bg-[#1D75F8] text-[17px] font-medium text-white transition-colors hover:bg-[#1569E8] sm:text-[18px]"
+              className="mt-7 inline-flex h-[62px] w-full items-center justify-center rounded-[22px] bg-[#1458CC] text-[17px] font-medium text-white transition-colors hover:bg-[#124A9E] sm:text-[18px]"
             >
               Continue
             </button>
@@ -1468,7 +1481,7 @@ export default function LandPlanning() {
               <button
                 type="button"
                 onClick={() => handleDownloadLegalDoc(viewingLegalDoc)}
-                className="h-10 rounded-[10px] bg-[#1D75F8] px-4 text-[14px] font-medium text-white hover:bg-[#1569E8]"
+                className="h-10 rounded-[10px] bg-[#1458CC] px-4 text-[14px] font-medium text-white hover:bg-[#124A9E]"
               >
                 Download
               </button>
@@ -1511,7 +1524,7 @@ export default function LandPlanning() {
                     Edit
                   </span>
                 ) : (
-                  <span className="rounded-full bg-[#EFF6FF] px-2.5 py-0.5 text-[12px] font-semibold leading-none text-[#2563EB] sm:px-3 sm:py-1 sm:text-[14px]">
+                  <span className="rounded-full bg-[#DBEAFE] px-2.5 py-0.5 text-[12px] font-semibold leading-none text-[#1D4ED8] sm:px-3 sm:py-1 sm:text-[14px]">
                     New
                   </span>
                 )}
@@ -1597,7 +1610,7 @@ export default function LandPlanning() {
                   className="text-[13px] font-medium leading-snug text-[#111827] sm:text-[14px]"
                 >
                   Ownership{" "}
-                  <span className="font-semibold text-[#2563EB]" aria-hidden>
+                  <span className="font-semibold text-[#1D4ED8]" aria-hidden>
                     *
                   </span>
                 </label>
@@ -1614,7 +1627,7 @@ export default function LandPlanning() {
                     }}
                     className={`flex min-h-[44px] w-full items-center justify-between gap-2 rounded-[10px] border bg-white px-3.5 text-left text-[15px] outline-none transition-[border-color,box-shadow] sm:min-h-[48px] sm:px-5 sm:text-[16px] md:min-h-[50px] md:text-[16px] ${
                       ownershipOpen
-                        ? "border-[#1D75F8] shadow-[0_0_0_3px_rgba(29,117,248,0.15)]"
+                        ? "border-[#1458CC] shadow-[0_0_0_3px_rgba(20,88,204,0.15)]"
                         : "border-[#E5E7EB] hover:border-[#CBD5E1]"
                     }`}
                   >
@@ -1630,7 +1643,7 @@ export default function LandPlanning() {
                       height="18"
                       viewBox="0 0 20 20"
                       fill="none"
-                      className={`shrink-0 text-[#1677FF] transition-transform duration-200 ${
+                      className={`shrink-0 text-[#1458CC] transition-transform duration-200 ${
                         ownershipOpen ? "rotate-180" : ""
                       }`}
                       aria-hidden
@@ -1678,8 +1691,8 @@ export default function LandPlanning() {
                               }}
                               className={`flex w-full items-center px-4 py-3 text-left text-[16px] transition-colors sm:px-5 sm:py-3.5 sm:text-[17px] md:text-[18px] ${
                                 selected
-                                  ? "bg-[#1D75F8] font-medium text-white"
-                                  : "bg-white text-[#374151] hover:bg-[#1D75F8] hover:font-medium hover:text-white"
+                                  ? "bg-[#1458CC] font-medium text-white"
+                                  : "bg-white text-[#374151] hover:bg-[#1458CC] hover:font-medium hover:text-white"
                               }`}
                             >
                               {option}
@@ -1714,7 +1727,7 @@ export default function LandPlanning() {
                   className="text-[13px] font-medium leading-snug text-[#111827] sm:text-[14px]"
                 >
                   Development Status{" "}
-                  <span className="font-semibold text-[#2563EB]" aria-hidden>
+                  <span className="font-semibold text-[#1D4ED8]" aria-hidden>
                     *
                   </span>
                 </label>
@@ -1731,7 +1744,7 @@ export default function LandPlanning() {
                     }}
                     className={`flex min-h-[44px] w-full items-center justify-between gap-2 rounded-[10px] border bg-white px-3.5 text-left text-[15px] outline-none transition-[border-color,box-shadow] sm:min-h-[48px] sm:px-5 sm:text-[16px] md:min-h-[50px] md:text-[16px] ${
                       devStatusOpen
-                        ? "border-[#1D75F8] shadow-[0_0_0_3px_rgba(29,117,248,0.15)]"
+                        ? "border-[#1458CC] shadow-[0_0_0_3px_rgba(20,88,204,0.15)]"
                         : "border-[#E5E7EB] hover:border-[#CBD5E1]"
                     }`}
                   >
@@ -1749,7 +1762,7 @@ export default function LandPlanning() {
                       height="18"
                       viewBox="0 0 20 20"
                       fill="none"
-                      className={`shrink-0 text-[#1677FF] transition-transform duration-200 ${
+                      className={`shrink-0 text-[#1458CC] transition-transform duration-200 ${
                         devStatusOpen ? "rotate-180" : ""
                       }`}
                       aria-hidden
@@ -1801,8 +1814,8 @@ export default function LandPlanning() {
                             }}
                             className={`flex w-full items-center px-4 py-3 text-left text-[16px] transition-colors sm:px-5 sm:py-3.5 sm:text-[17px] md:text-[18px] ${
                               selected
-                                ? "bg-[#1D75F8] font-medium text-white"
-                                : "bg-white text-[#374151] hover:bg-[#1D75F8] hover:font-medium hover:text-white"
+                                ? "bg-[#1458CC] font-medium text-white"
+                                : "bg-white text-[#374151] hover:bg-[#1458CC] hover:font-medium hover:text-white"
                             }`}
                           >
                             {option}
@@ -1838,7 +1851,7 @@ export default function LandPlanning() {
                 onClick={() => {
                   if (editLandRecord) applyLandRecordEditFromModal();
                 }}
-                className="h-10 w-full touch-manipulation rounded-[10px] bg-[#1D75F8] px-4 text-[14px] font-medium text-white shadow-[0_1px_2px_rgba(16,24,40,0.08)] sm:h-11 sm:w-[160px] sm:text-[15px]"
+                className="h-10 w-full touch-manipulation rounded-[10px] bg-[#1458CC] px-4 text-[14px] font-medium text-white shadow-[0_1px_2px_rgba(16,24,40,0.08)] sm:h-11 sm:w-[160px] sm:text-[15px]"
               >
                 {editLandRecord ? "Save changes" : "Create Project"}
               </button>
@@ -1870,7 +1883,7 @@ export default function LandPlanning() {
                 className="flex w-full items-center justify-between gap-4 rounded-md px-3 py-3 text-[14px] font-medium text-[#333333] transition-colors hover:bg-[#F8FAFC] active:bg-[#F1F5F9] sm:px-3.5 sm:text-[15px]"
               >
                 <svg
-                  className="shrink-0 text-[#1D75F8]"
+                  className="shrink-0 text-[#1458CC]"
                   width="18"
                   height="18"
                   viewBox="0 0 24 24"

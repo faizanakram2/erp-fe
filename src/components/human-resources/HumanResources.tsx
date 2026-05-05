@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -14,7 +14,19 @@ const HR_SUMMARY = [
 const HR_TABS = ["Employees", "Attendance", "Contractors", "Payroll"] as const;
 type HrTab = (typeof HR_TABS)[number];
 
-const EMPLOYEES = [
+type Employee = {
+  id: string;
+  name: string;
+  role: string;
+  department: string;
+  email: string;
+  phone: string;
+  salary: string;
+  joined: string;
+  avatarSrc: string;
+};
+
+const INITIAL_EMPLOYEES: Employee[] = [
   {
     id: "emp-1",
     name: "Fatima Noor",
@@ -50,12 +62,12 @@ const EMPLOYEES = [
   },
 ];
 
-const DEPARTMENT_OPTIONS = [
-  "Select Project",
-  "Sales",
-  "Construction",
-  "Finance",
-  "Human Resources",
+const HR_EMPLOYEES_STORAGE_KEY = "hr-employees-v1";
+
+const PROJECT_OPTIONS = [
+  "Green Valley Phase 1",
+  "Royal Palm Estate",
+  "Sunrise Heights",
 ] as const;
 
 const ATTENDANCE_ROWS = [
@@ -139,14 +151,31 @@ export default function HumanResources({ defaultTab = "Employees" }: { defaultTa
   const [checkInHour, setCheckInHour] = useState("9");
   const [checkInMinute, setCheckInMinute] = useState("25");
   const [checkInMeridiem, setCheckInMeridiem] = useState<"AM" | "PM">("AM");
-  const [checkOutTime, setCheckOutTime] = useState("");
+  const [checkOutHour, setCheckOutHour] = useState("5");
+  const [checkOutMinute, setCheckOutMinute] = useState("30");
+  const [checkOutMeridiem, setCheckOutMeridiem] = useState<"AM" | "PM">("PM");
   const [isCheckInPickerOpen, setIsCheckInPickerOpen] = useState(false);
+  const [isCheckOutPickerOpen, setIsCheckOutPickerOpen] = useState(false);
   const [openAttendanceActionId, setOpenAttendanceActionId] = useState<string | null>(null);
   const [openContractorActionId, setOpenContractorActionId] = useState<string | null>(null);
   const [openPayrollActionId, setOpenPayrollActionId] = useState<string | null>(null);
   const [contractorTypeOpen, setContractorTypeOpen] = useState(false);
   const [contractorType, setContractorType] = useState("Main Contractor");
+  const [joiningDate, setJoiningDate] = useState("");
+  const [joiningCalendarOpen, setJoiningCalendarOpen] = useState(false);
+  const [joiningCalendarMonth, setJoiningCalendarMonth] = useState(() => {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), 1);
+  });
+  const [employees, setEmployees] = useState<Employee[]>(INITIAL_EMPLOYEES);
+  const employeesHydrated = useRef(false);
+  const [newEmployeeName, setNewEmployeeName] = useState("");
+  const [newEmployeeEmail, setNewEmployeeEmail] = useState("");
+  const [newEmployeePhone, setNewEmployeePhone] = useState("");
+  const [newEmployeeRole, setNewEmployeeRole] = useState("");
+  const [newEmployeeSalary, setNewEmployeeSalary] = useState("");
   const departmentRootRef = useRef<HTMLDivElement>(null);
+  const joiningDateRootRef = useRef<HTMLDivElement>(null);
   const datePickerRootRef = useRef<HTMLDivElement>(null);
   const statusRootRef = useRef<HTMLDivElement>(null);
   const contractorTypeRootRef = useRef<HTMLDivElement>(null);
@@ -164,6 +193,113 @@ export default function HumanResources({ defaultTab = "Employees" }: { defaultTa
     ...Array.from({ length: monthStartDay }, () => null),
     ...Array.from({ length: monthDaysCount }, (_, i) => i + 1),
   ];
+
+  const formattedJoiningDate = joiningDate
+    ? (() => {
+        const [year, month, day] = joiningDate.split("-");
+        return `${day}/${month}/${year}`;
+      })()
+    : "";
+  const joiningMonthLabel = joiningCalendarMonth.toLocaleDateString("en-US", {
+    month: "long",
+    year: "numeric",
+  });
+  const joiningMonthStartDay = new Date(
+    joiningCalendarMonth.getFullYear(),
+    joiningCalendarMonth.getMonth(),
+    1,
+  ).getDay();
+  const joiningMonthDaysCount = new Date(
+    joiningCalendarMonth.getFullYear(),
+    joiningCalendarMonth.getMonth() + 1,
+    0,
+  ).getDate();
+  const joiningCalendarCells = [
+    ...Array.from({ length: joiningMonthStartDay }, () => null),
+    ...Array.from({ length: joiningMonthDaysCount }, (_, i) => i + 1),
+  ];
+
+  const resetAddEmployeeForm = useCallback(() => {
+    setNewEmployeeName("");
+    setNewEmployeeEmail("");
+    setNewEmployeePhone("");
+    setNewEmployeeRole("");
+    setNewEmployeeSalary("");
+    setDepartment(null);
+    setDepartmentOpen(false);
+    setJoiningDate("");
+    setJoiningCalendarOpen(false);
+  }, []);
+
+  const handleSaveEmployee = useCallback(() => {
+    const name = newEmployeeName.trim();
+    const email = newEmployeeEmail.trim();
+    const phone = newEmployeePhone.trim();
+    const role = newEmployeeRole.trim();
+    const salaryRaw = newEmployeeSalary.trim();
+    if (!name || !email || !phone || !role || !department || !salaryRaw || !joiningDate) {
+      window.alert("Please fill in all required fields.");
+      return;
+    }
+    const salaryNum = Number.parseFloat(salaryRaw.replace(/,/g, ""));
+    const salaryDisplay = Number.isFinite(salaryNum)
+      ? `PKR ${Math.round(salaryNum).toLocaleString("en-PK")}`
+      : `PKR ${salaryRaw}`;
+    const avatarPool = ["/images/employee-1.svg", "/images/employee-2.svg", "/images/employee-3.svg"] as const;
+    setEmployees((prev) => {
+      const avatarSrc = avatarPool[prev.length % avatarPool.length]!;
+      const newEmp: Employee = {
+        id: `emp-${Date.now()}`,
+        name,
+        role,
+        department,
+        email,
+        phone,
+        salary: salaryDisplay,
+        joined: joiningDate,
+        avatarSrc,
+      };
+      return [...prev, newEmp];
+    });
+    resetAddEmployeeForm();
+    setIsAddEmployeeOpen(false);
+  }, [
+    newEmployeeName,
+    newEmployeeEmail,
+    newEmployeePhone,
+    newEmployeeRole,
+    newEmployeeSalary,
+    department,
+    joiningDate,
+    resetAddEmployeeForm,
+  ]);
+
+  useEffect(() => {
+    if (!employeesHydrated.current) {
+      employeesHydrated.current = true;
+      try {
+        const raw = localStorage.getItem(HR_EMPLOYEES_STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw) as unknown;
+          if (Array.isArray(parsed) && parsed.length > 0) setEmployees(parsed as Employee[]);
+        }
+      } catch {
+        /* keep INITIAL_EMPLOYEES */
+      }
+      return;
+    }
+    try {
+      localStorage.setItem(HR_EMPLOYEES_STORAGE_KEY, JSON.stringify(employees));
+    } catch {
+      /* ignore */
+    }
+  }, [employees]);
+
+  useEffect(() => {
+    if (isAddEmployeeOpen) return;
+    setJoiningDate("");
+    setJoiningCalendarOpen(false);
+  }, [isAddEmployeeOpen]);
 
   useEffect(() => {
     if (!isAddEmployeeOpen) return;
@@ -187,15 +323,35 @@ export default function HumanResources({ defaultTab = "Employees" }: { defaultTa
     if (!isAddEmployeeOpen) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
+      if (joiningCalendarOpen) {
+        setJoiningCalendarOpen(false);
+        return;
+      }
       if (departmentOpen) {
         setDepartmentOpen(false);
         return;
       }
+      resetAddEmployeeForm();
       setIsAddEmployeeOpen(false);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [isAddEmployeeOpen, departmentOpen]);
+  }, [isAddEmployeeOpen, departmentOpen, joiningCalendarOpen, resetAddEmployeeForm]);
+
+  useEffect(() => {
+    if (!isAddEmployeeOpen || !joiningCalendarOpen) return;
+    const close = (e: MouseEvent | TouchEvent) => {
+      const target = e.target as Node;
+      if (joiningDateRootRef.current?.contains(target)) return;
+      setJoiningCalendarOpen(false);
+    };
+    document.addEventListener("mousedown", close);
+    document.addEventListener("touchstart", close, { passive: true });
+    return () => {
+      document.removeEventListener("mousedown", close);
+      document.removeEventListener("touchstart", close);
+    };
+  }, [isAddEmployeeOpen, joiningCalendarOpen]);
 
   useEffect(() => {
     if (!isAddContractorOpen) return;
@@ -337,19 +493,23 @@ export default function HumanResources({ defaultTab = "Employees" }: { defaultTa
         setIsCheckInPickerOpen(false);
         return;
       }
+      if (isCheckOutPickerOpen) {
+        setIsCheckOutPickerOpen(false);
+        return;
+      }
       setIsFullMonthReportOpen(false);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [isFullMonthReportOpen, reportStatusOpen, isCheckInPickerOpen]);
+  }, [isFullMonthReportOpen, reportStatusOpen, isCheckInPickerOpen, isCheckOutPickerOpen]);
 
   return (
     <div className="h-full overflow-y-auto bg-[#F3F4F6] p-5 sm:p-6 md:p-7">
       <div className="bg-transparent">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="space-y-1">
-            <h1 className="text-[32px] font-semibold leading-tight text-[#111827] sm:text-[34px]">HRM</h1>
-            <p className="text-[14px] text-[#64748B]">
+            <h1 className="text-[22px] font-semibold leading-tight text-[#111827] sm:text-[24px]">HRM</h1>
+            <p className="text-[13px] text-[#64748B]">
               Manage employees, contractors, attendance, and payroll
             </p>
           </div>
@@ -357,11 +517,10 @@ export default function HumanResources({ defaultTab = "Employees" }: { defaultTa
           <button
             type="button"
             onClick={() => {
-              setDepartment(null);
-              setDepartmentOpen(false);
+              resetAddEmployeeForm();
               setIsAddEmployeeOpen(true);
             }}
-            className="inline-flex h-[56px] items-center justify-center gap-2 self-start rounded-[10px] bg-[#1D75F8] px-6 text-[15px] font-medium text-white transition-colors hover:bg-[#1569E8]"
+            className="inline-flex h-[52px] items-center justify-center gap-2 self-start rounded-[10px] bg-[#1D75F8] px-5 text-[14px] font-medium text-white transition-colors hover:bg-[#1569E8]"
           >
             <span className="text-[24px] leading-none">+</span>
             Add Employee
@@ -376,9 +535,9 @@ export default function HumanResources({ defaultTab = "Employees" }: { defaultTa
             >
               <div className="relative pl-3">
                 <span className="absolute bottom-0 left-0 top-0 w-[3px] rounded-full bg-[#1D75F8]" />
-                <p className="text-[14px] text-[#64748B]">{item.label}</p>
-                <p className="mt-0.5 text-[30px] font-medium leading-none text-[#111827]">
-                  {item.value}
+                <p className="text-[13px] text-[#64748B]">{item.label}</p>
+                <p className="mt-0.5 text-[22px] font-medium leading-none text-[#111827]">
+                  {item.label === "Total Employees" ? employees.length : item.value}
                 </p>
               </div>
               <span className="inline-flex h-[18px] w-[18px] items-center justify-center rounded-[4px] bg-[#1D75F8] text-white">
@@ -394,7 +553,7 @@ export default function HumanResources({ defaultTab = "Employees" }: { defaultTa
               key={tab}
               type="button"
               onClick={() => setActiveTab(tab)}
-              className={`h-[42px] px-4 text-[15px] font-medium ${
+                className={`h-[40px] px-4 text-[14px] font-medium ${
                 activeTab === tab
                   ? "bg-[#F8FAFC] text-[#1E293B]"
                   : "bg-white text-[#475569] hover:bg-[#F8FAFC]"
@@ -407,7 +566,7 @@ export default function HumanResources({ defaultTab = "Employees" }: { defaultTa
         {activeTab === "Attendance" ? (
           <section className="mt-8">
             <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-              <h2 className="whitespace-nowrap text-[24px] font-semibold leading-tight text-[#1F2937] sm:text-[30px]">
+              <h2 className="whitespace-nowrap text-[16px] font-semibold leading-tight text-[#1F2937] sm:text-[18px]">
                 Today&apos;s Attendance - 20/02/2026
               </h2>
               <div className="flex w-full flex-col gap-2.5 sm:w-auto sm:flex-row">
@@ -427,7 +586,7 @@ export default function HumanResources({ defaultTab = "Employees" }: { defaultTa
                     <div className="absolute left-0 top-full z-20 mt-2 w-[308px] rounded-[12px] border border-[#D1D5DB] bg-white p-3 shadow-[0_10px_25px_rgba(15,23,42,0.14)]">
                       <div className="mb-2 flex items-center justify-between">
                         <div className="flex items-center gap-1.5">
-                          <p className="text-[24px] font-semibold leading-none text-[#111827]">{monthLabel}</p>
+                          <p className="text-[20px] font-semibold leading-none text-[#111827]">{monthLabel}</p>
                           <button
                             type="button"
                             className="inline-flex h-7 w-7 items-center justify-center rounded-md text-[28px] leading-none text-[#1D75F8] hover:bg-[#EFF6FF]"
@@ -531,8 +690,8 @@ export default function HumanResources({ defaultTab = "Employees" }: { defaultTa
                         <span
                           className={`inline-flex min-w-[108px] items-center justify-center rounded-full px-4 py-[6px] text-[16px] font-medium leading-none ${
                             row.status === "Present"
-                              ? "bg-[#69C7AB] text-white"
-                              : "bg-[#F87171] text-white"
+                              ? "bg-[#166534] text-white"
+                              : "bg-[#991B1B] text-white"
                           }`}
                         >
                           {row.status}
@@ -590,7 +749,7 @@ export default function HumanResources({ defaultTab = "Employees" }: { defaultTa
         ) : activeTab === "Contractors" ? (
           <section className="mt-8">
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-[40px] font-semibold text-[#1F2937]">Active Contractors</h2>
+              <h2 className="text-[22px] font-semibold text-[#1F2937]">Active Contractors</h2>
               <button
                 type="button"
                 className="inline-flex h-[44px] items-center justify-center gap-2 rounded-[10px] bg-[#1D75F8] px-5 text-[14px] font-medium text-white"
@@ -625,7 +784,13 @@ export default function HumanResources({ defaultTab = "Employees" }: { defaultTa
                       <td className="px-4 py-7 text-[16px] text-[#6B7280]">{row.type}</td>
                       <td className="px-4 py-7 text-[16px] text-[#6B7280]">{row.contact}</td>
                       <td className="px-4 py-7">
-                        <span className="inline-flex min-w-[116px] items-center justify-center rounded-full bg-[#69C7AB] px-4 py-[6px] text-[16px] font-medium leading-none text-white">
+                        <span
+                          className={`inline-flex min-w-[116px] items-center justify-center rounded-full px-4 py-[6px] text-[16px] font-medium leading-none ${
+                            row.status === "Active"
+                              ? "bg-[#166534] text-white"
+                              : "bg-[#E5E7EB] text-[#374151]"
+                          }`}
+                        >
                           {row.status}
                         </span>
                       </td>
@@ -672,7 +837,7 @@ export default function HumanResources({ defaultTab = "Employees" }: { defaultTa
         ) : activeTab === "Payroll" ? (
           <section className="mt-8">
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-[40px] font-semibold text-[#1F2937]">Payroll - February 2026</h2>
+              <h2 className="text-[22px] font-semibold text-[#1F2937]">Payroll - February 2026</h2>
               <button
                 type="button"
                 className="inline-flex h-[44px] items-center justify-center rounded-[10px] bg-[#1D75F8] px-5 text-[14px] font-medium text-white"
@@ -746,10 +911,10 @@ export default function HumanResources({ defaultTab = "Employees" }: { defaultTa
           </section>
         ) : (
           <>
-            <h2 className="mt-8 text-[34px] font-semibold text-[#1F2937]">Employee Directory</h2>
+            <h2 className="mt-8 text-[22px] font-semibold text-[#1F2937]">Employee Directory</h2>
 
             <div className="mt-5 space-y-3">
-              {EMPLOYEES.map((employee) => (
+              {employees.map((employee) => (
                 <article
                   key={employee.id}
                   className="flex flex-col gap-3 rounded-[10px] border border-[#BDBDBD] bg-[#F9FAFB] px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6"
@@ -786,21 +951,24 @@ export default function HumanResources({ defaultTab = "Employees" }: { defaultTa
       {isAddEmployeeOpen ? (
         <div
           className="fixed inset-0 z-[70] flex items-end justify-center bg-black/35 p-2 sm:items-center sm:p-4"
-          onClick={() => setIsAddEmployeeOpen(false)}
+          onClick={() => {
+            resetAddEmployeeForm();
+            setIsAddEmployeeOpen(false);
+          }}
           role="presentation"
         >
           <div
-            className="w-full max-w-[760px] rounded-[22px] bg-white px-5 pb-5 pt-5 shadow-2xl sm:px-10 sm:pb-6 sm:pt-6"
+            className="w-full max-w-[600px] min-h-[min(90dvh,620px)] rounded-[22px] bg-white px-5 py-7 shadow-2xl sm:min-h-[680px] sm:px-10 sm:py-8"
             onClick={(e) => e.stopPropagation()}
             role="dialog"
             aria-modal="true"
             aria-labelledby="add-employee-title"
           >
             <div className="space-y-1.5">
-              <h3 id="add-employee-title" className="text-[40px] font-semibold leading-tight text-[#1F2937] sm:text-[42px]">
+              <h3 id="add-employee-title" className="text-[20px] font-semibold leading-tight text-[#1F2937] sm:text-[22px]">
                 Add Employee
               </h3>
-              <p className="text-[14px] text-[#64748B] sm:text-[16px]">Add a new employee</p>
+              <p className="text-[12px] text-[#64748B] sm:text-[13px]">Add a new employee</p>
             </div>
 
             <div className="mt-5 space-y-3.5 sm:space-y-4">
@@ -809,6 +977,9 @@ export default function HumanResources({ defaultTab = "Employees" }: { defaultTa
                 <input
                   type="text"
                   placeholder="e.g., Ahmed Khan"
+                  value={newEmployeeName}
+                  onChange={(e) => setNewEmployeeName(e.target.value)}
+                  autoComplete="name"
                   className="h-[72px] w-full rounded-[12px] border border-[#E5E7EB] px-5 text-[16px] text-[#111827] outline-none placeholder:text-[#A3A3A3] sm:text-[17px]"
                 />
               </div>
@@ -821,6 +992,9 @@ export default function HumanResources({ defaultTab = "Employees" }: { defaultTa
                   <input
                     type="email"
                     placeholder="e.g. ahmed@gmail.com"
+                    value={newEmployeeEmail}
+                    onChange={(e) => setNewEmployeeEmail(e.target.value)}
+                    autoComplete="email"
                     className="h-[72px] w-full rounded-[12px] border border-[#E5E7EB] px-5 text-[16px] text-[#111827] outline-none placeholder:text-[#A3A3A3] sm:text-[17px]"
                   />
                 </div>
@@ -831,6 +1005,9 @@ export default function HumanResources({ defaultTab = "Employees" }: { defaultTa
                   <input
                     type="text"
                     placeholder="e.g, +92 3223234393"
+                    value={newEmployeePhone}
+                    onChange={(e) => setNewEmployeePhone(e.target.value)}
+                    autoComplete="tel"
                     className="h-[72px] w-full rounded-[12px] border border-[#E5E7EB] px-5 text-[16px] text-[#111827] outline-none placeholder:text-[#A3A3A3] sm:text-[17px]"
                   />
                 </div>
@@ -844,21 +1021,27 @@ export default function HumanResources({ defaultTab = "Employees" }: { defaultTa
                   <input
                     type="text"
                     placeholder="e.g. Engineer"
+                    value={newEmployeeRole}
+                    onChange={(e) => setNewEmployeeRole(e.target.value)}
+                    autoComplete="organization-title"
                     className="h-[72px] w-full rounded-[12px] border border-[#E5E7EB] px-5 text-[16px] text-[#111827] outline-none placeholder:text-[#A3A3A3] sm:text-[17px]"
                   />
                 </div>
 
                 <div className="space-y-2" ref={departmentRootRef}>
                   <label className="text-[16px] font-medium leading-none text-[#111827] sm:text-[18px]">
-                    Select Department <span aria-hidden>*</span>
+                    Select Project <span aria-hidden>*</span>
                   </label>
                   <div className="relative">
                     <button
                       type="button"
                       aria-haspopup="listbox"
                       aria-expanded={departmentOpen}
-                      aria-controls="department-listbox"
-                      onClick={() => setDepartmentOpen((o) => !o)}
+                      aria-controls="employee-project-listbox"
+                      onClick={() => {
+                        setJoiningCalendarOpen(false);
+                        setDepartmentOpen((o) => !o);
+                      }}
                       className={`flex h-[72px] w-full items-center justify-between gap-3 rounded-[12px] border bg-white px-5 text-left text-[16px] outline-none transition-[border-color,box-shadow] sm:text-[17px] ${
                         departmentOpen
                           ? "border-[#1D75F8] shadow-[0_0_0_3px_rgba(29,117,248,0.15)]"
@@ -877,11 +1060,11 @@ export default function HumanResources({ defaultTab = "Employees" }: { defaultTa
 
                     {departmentOpen ? (
                       <ul
-                        id="department-listbox"
+                        id="employee-project-listbox"
                         role="listbox"
                         className="absolute left-0 right-0 top-full z-10 mt-1 overflow-hidden rounded-[10px] border border-[#D1D5DB] bg-white shadow-[0_10px_30px_rgba(15,23,42,0.12)]"
                       >
-                        {DEPARTMENT_OPTIONS.map((option) => (
+                        {PROJECT_OPTIONS.map((option) => (
                           <li key={option} role="presentation" className="border-b border-[#F0F2F5] last:border-b-0">
                             <button
                               type="button"
@@ -915,18 +1098,113 @@ export default function HumanResources({ defaultTab = "Employees" }: { defaultTa
                   <input
                     type="text"
                     placeholder="e.g. 5500000"
+                    inputMode="decimal"
+                    value={newEmployeeSalary}
+                    onChange={(e) => setNewEmployeeSalary(e.target.value)}
                     className="h-[72px] w-full rounded-[12px] border border-[#E5E7EB] px-5 text-[16px] text-[#111827] outline-none placeholder:text-[#A3A3A3] sm:text-[17px]"
                   />
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-2" ref={joiningDateRootRef}>
                   <label className="text-[16px] font-medium leading-none text-[#111827] sm:text-[18px]">
                     Joining Date <span aria-hidden>*</span>
                   </label>
-                  <input
-                    type="text"
-                    placeholder="e,g. 400000"
-                    className="h-[72px] w-full rounded-[12px] border border-[#E5E7EB] px-5 text-[16px] text-[#111827] outline-none placeholder:text-[#A3A3A3] sm:text-[17px]"
-                  />
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setDepartmentOpen(false);
+                        setJoiningCalendarOpen((o) => !o);
+                      }}
+                      className="flex h-[72px] w-full items-center gap-2.5 rounded-[12px] border border-[#E5E7EB] bg-white px-5 text-left text-[16px] outline-none transition-[border-color,box-shadow] sm:text-[17px]"
+                    >
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        aria-hidden
+                        className="shrink-0 text-[#6B7280]"
+                      >
+                        <rect x="3.75" y="4.75" width="16.5" height="15.5" rx="2.5" stroke="currentColor" strokeWidth="1.7" />
+                        <path d="M7.5 3v3.5M16.5 3v3.5M3.75 9.25h16.5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+                      </svg>
+                      <span className={formattedJoiningDate ? "text-[#111827]" : "text-[#A3A3A3]"}>
+                        {formattedJoiningDate || "dd/mm/yyyy"}
+                      </span>
+                    </button>
+                    {joiningCalendarOpen ? (
+                      <div className="absolute left-0 top-full z-20 mt-2 w-[min(100%,308px)] rounded-[12px] border border-[#D1D5DB] bg-white p-3 shadow-[0_10px_25px_rgba(15,23,42,0.14)]">
+                        <div className="mb-2 flex items-center justify-between">
+                          <div className="flex items-center gap-1.5">
+                            <p className="text-[20px] font-semibold leading-none text-[#111827]">{joiningMonthLabel}</p>
+                            <button
+                              type="button"
+                              className="inline-flex h-7 w-7 items-center justify-center rounded-md text-[28px] leading-none text-[#1D75F8] hover:bg-[#EFF6FF]"
+                              onClick={() =>
+                                setJoiningCalendarMonth((d) => new Date(d.getFullYear(), d.getMonth() + 1, 1))
+                              }
+                              aria-label="Next month"
+                            >
+                              &gt;
+                            </button>
+                          </div>
+                          <div className="flex items-center gap-0.5">
+                            <button
+                              type="button"
+                              className="inline-flex h-7 w-7 items-center justify-center rounded-md text-[28px] leading-none text-[#1D75F8] hover:bg-[#EFF6FF]"
+                              onClick={() =>
+                                setJoiningCalendarMonth((d) => new Date(d.getFullYear(), d.getMonth() - 1, 1))
+                              }
+                              aria-label="Previous month"
+                            >
+                              &lt;
+                            </button>
+                            <button
+                              type="button"
+                              className="inline-flex h-7 w-7 items-center justify-center rounded-md text-[28px] leading-none text-[#1D75F8] hover:bg-[#EFF6FF]"
+                              onClick={() =>
+                                setJoiningCalendarMonth((d) => new Date(d.getFullYear(), d.getMonth() + 1, 1))
+                              }
+                              aria-label="Next month"
+                            >
+                              &gt;
+                            </button>
+                          </div>
+                        </div>
+                        <div className="mb-1 grid grid-cols-7 gap-1 text-center text-[11px] text-[#94A3B8]">
+                          {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((day) => (
+                            <span key={day}>{day}</span>
+                          ))}
+                        </div>
+                        <div className="grid grid-cols-7 gap-1">
+                          {joiningCalendarCells.map((day, idx) => {
+                            if (!day) return <span key={`join-empty-${idx}`} className="h-8" />;
+                            const month = `${joiningCalendarMonth.getMonth() + 1}`.padStart(2, "0");
+                            const dayText = `${day}`.padStart(2, "0");
+                            const value = `${joiningCalendarMonth.getFullYear()}-${month}-${dayText}`;
+                            const isSelected = joiningDate === value;
+                            return (
+                              <button
+                                key={value}
+                                type="button"
+                                onClick={() => {
+                                  setJoiningDate(value);
+                                  setJoiningCalendarOpen(false);
+                                }}
+                                className={`h-8 rounded-md text-[12px] ${
+                                  isSelected
+                                    ? "bg-[#1D75F8] text-white"
+                                    : "text-[#334155] hover:bg-[#EFF6FF]"
+                                }`}
+                              >
+                                {day}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ) : null}
+                  </div>
                 </div>
               </div>
             </div>
@@ -934,13 +1212,17 @@ export default function HumanResources({ defaultTab = "Employees" }: { defaultTa
             <div className="mt-5 flex justify-end gap-2.5 sm:mt-6">
               <button
                 type="button"
-                onClick={() => setIsAddEmployeeOpen(false)}
+                onClick={() => {
+                  resetAddEmployeeForm();
+                  setIsAddEmployeeOpen(false);
+                }}
                 className="h-[52px] rounded-[12px] border border-[#E5E7EB] bg-[#F8FAFC] px-7 text-[15px] font-medium text-[#111827]"
               >
                 Cancel
               </button>
               <button
                 type="button"
+                onClick={handleSaveEmployee}
                 className="h-[52px] rounded-[12px] bg-[#1D75F8] px-9 text-[15px] font-medium text-white transition-colors hover:bg-[#1569E8]"
               >
                 Save
@@ -964,10 +1246,10 @@ export default function HumanResources({ defaultTab = "Employees" }: { defaultTa
             aria-labelledby="add-contractor-title"
           >
             <div className="space-y-1">
-              <h3 id="add-contractor-title" className="text-[34px] font-semibold leading-tight text-[#111827]">
+              <h3 id="add-contractor-title" className="text-[20px] font-semibold leading-tight text-[#111827]">
                 Add Contractor
               </h3>
-              <p className="text-[16px] text-[#64748B]">Add a new Contractor</p>
+              <p className="text-[13px] text-[#64748B]">Add a new Contractor</p>
             </div>
 
             <div className="mt-6 space-y-4">
@@ -1119,7 +1401,7 @@ export default function HumanResources({ defaultTab = "Employees" }: { defaultTa
               </svg>
             </div>
 
-            <h3 id="contractor-added-title" className="mt-4 text-center text-[36px] font-semibold leading-tight text-[#111827]">
+            <h3 id="contractor-added-title" className="mt-4 text-center text-[20px] font-semibold leading-tight text-[#111827]">
               Contractor Added
             </h3>
 
@@ -1147,10 +1429,10 @@ export default function HumanResources({ defaultTab = "Employees" }: { defaultTa
             aria-modal="true"
             aria-labelledby="full-month-report-title"
           >
-            <h3 id="full-month-report-title" className="text-[30px] font-semibold leading-tight text-[#1F2937] sm:text-[32px]">
+            <h3 id="full-month-report-title" className="text-[18px] font-semibold leading-tight text-[#1F2937] sm:text-[20px]">
               Ahmed Khan
             </h3>
-            <p className="mt-1 text-[14px] text-[#64748B] sm:text-[16px]">Mark Attendance</p>
+            <p className="mt-1 text-[12px] text-[#64748B] sm:text-[13px]">Mark Attendance</p>
 
             <div className="mt-5 space-y-3.5">
               <div className="space-y-2.5" ref={statusRootRef}>
@@ -1219,7 +1501,10 @@ export default function HumanResources({ defaultTab = "Employees" }: { defaultTa
                   <div className="relative">
                     <button
                       type="button"
-                      onClick={() => setIsCheckInPickerOpen((o) => !o)}
+                      onClick={() => {
+                        setIsCheckInPickerOpen((o) => !o);
+                        setIsCheckOutPickerOpen(false);
+                      }}
                       className="flex h-[50px] w-full items-center justify-between rounded-[10px] border border-[#E5E7EB] bg-white px-4 text-[15px] text-[#A3A3A3] sm:text-[16px]"
                     >
                       {`${checkInHour.padStart(2, "0")}:${checkInMinute} ${checkInMeridiem}`}
@@ -1282,17 +1567,68 @@ export default function HumanResources({ defaultTab = "Employees" }: { defaultTa
                   <label className="text-[16px] font-medium text-[#111827] sm:text-[18px]">
                     Check Out <span aria-hidden>*</span>
                   </label>
-                  <div className="flex h-[50px] w-full items-center justify-between rounded-[10px] border border-[#E5E7EB] bg-white px-4 text-[15px] text-[#A3A3A3] sm:text-[16px]">
-                    <input
-                      type="time"
-                      value={checkOutTime}
-                      onChange={(e) => setCheckOutTime(e.target.value)}
-                      className="w-full appearance-none bg-transparent text-[15px] text-[#A3A3A3] outline-none [color-scheme:light] [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none sm:text-[16px]"
-                    />
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden className="ml-2 shrink-0 text-[#9CA3AF]">
-                      <circle cx="12" cy="12" r="9.2" stroke="currentColor" strokeWidth="2" />
-                      <path d="M12 7.5V12l3.2 1.9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                    </svg>
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsCheckOutPickerOpen((o) => !o);
+                        setIsCheckInPickerOpen(false);
+                      }}
+                      className="flex h-[50px] w-full items-center justify-between rounded-[10px] border border-[#E5E7EB] bg-white px-4 text-[15px] text-[#A3A3A3] sm:text-[16px]"
+                    >
+                      {`${checkOutHour.padStart(2, "0")}:${checkOutMinute} ${checkOutMeridiem}`}
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden className="text-[#9CA3AF]">
+                        <circle cx="12" cy="12" r="9.2" stroke="currentColor" strokeWidth="2" />
+                        <path d="M12 7.5V12l3.2 1.9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                      </svg>
+                    </button>
+
+                    {isCheckOutPickerOpen ? (
+                      <div className="absolute left-2 top-full z-20 mt-2 flex overflow-hidden rounded-[10px] bg-[#F3F4F6] shadow-[0_8px_20px_rgba(15,23,42,0.15)]">
+                        <div className="max-h-[210px] overflow-y-auto px-4 py-2">
+                          {[...Array.from({ length: 10 }, (_, i) => (i + 1).toString())].map((hour) => (
+                            <button
+                              key={`out-h-${hour}`}
+                              type="button"
+                              onClick={() => setCheckOutHour(hour)}
+                              className={`my-1 block w-[34px] rounded-[7px] py-1 text-[14px] ${
+                                checkOutHour === hour ? "bg-[#1D75F8] text-white" : "text-[#111827]"
+                              }`}
+                            >
+                              {hour}
+                            </button>
+                          ))}
+                        </div>
+                        <div className="max-h-[210px] overflow-y-auto px-4 py-2">
+                          {["19", "20", "21", "22", "23", "24", "25", "26", "27", "28"].map((minute) => (
+                            <button
+                              key={`out-m-${minute}`}
+                              type="button"
+                              onClick={() => setCheckOutMinute(minute)}
+                              className={`my-1 block w-[34px] rounded-[7px] py-1 text-[14px] ${
+                                checkOutMinute === minute ? "bg-[#1D75F8] text-white" : "text-[#111827]"
+                              }`}
+                            >
+                              {minute}
+                            </button>
+                          ))}
+                        </div>
+                        <div className="m-2 rounded-[18px] bg-[#EBEEF2] p-1">
+                          {(["AM", "PM"] as const).map((slot) => (
+                            <button
+                              key={`out-${slot}`}
+                              type="button"
+                              onClick={() => setCheckOutMeridiem(slot)}
+                              className={`block w-[48px] rounded-[14px] py-2 text-[14px] ${
+                                checkOutMeridiem === slot ? "bg-[#1D75F8] text-white" : "text-[#111827]"
+                              }`}
+                            >
+                              {slot}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    ) : null}
                   </div>
                 </div>
               </div>
@@ -1346,7 +1682,7 @@ export default function HumanResources({ defaultTab = "Employees" }: { defaultTa
               </svg>
             </div>
 
-            <h3 id="marked-success-title" className="mt-3 text-center text-[34px] font-semibold leading-tight text-[#111827]">
+            <h3 id="marked-success-title" className="mt-3 text-center text-[18px] font-semibold leading-tight text-[#111827]">
               Marked
             </h3>
 

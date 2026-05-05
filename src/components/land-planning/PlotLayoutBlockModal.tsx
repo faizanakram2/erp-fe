@@ -30,8 +30,8 @@ function buildCellStatuses(block: PlotLayoutBlockData): CellKind[] {
 }
 
 const cellClass: Record<CellKind, string> = {
-  sold: "bg-[#10B981]",
-  available: "bg-[#3B82F6]",
+  sold: "bg-[#059669]",
+  available: "bg-[#1D4ED8]",
   reserved: "bg-[#F97316]",
   empty: "bg-slate-200",
 };
@@ -123,7 +123,7 @@ export default function PlotLayoutBlockModal({
             <ul className="flex flex-col gap-2">
               <li className="flex items-center justify-between gap-3">
                 <span
-                  className="h-7 w-7 shrink-0 rounded-md bg-[#10B981] sm:h-8 sm:w-8"
+                  className="h-7 w-7 shrink-0 rounded-md bg-[#059669] sm:h-8 sm:w-8"
                   aria-hidden
                 />
                 <span className="text-[13px] text-[#374151] sm:text-[14px]">
@@ -132,7 +132,7 @@ export default function PlotLayoutBlockModal({
               </li>
               <li className="flex items-center justify-between gap-3">
                 <span
-                  className="h-7 w-7 shrink-0 rounded-md bg-[#3B82F6] sm:h-8 sm:w-8"
+                  className="h-7 w-7 shrink-0 rounded-md bg-[#1D4ED8] sm:h-8 sm:w-8"
                   aria-hidden
                 />
                 <span className="text-[13px] text-[#374151] sm:text-[14px]">
@@ -177,7 +177,7 @@ export default function PlotLayoutBlockModal({
           </button>
           <button
             type="button"
-            className="inline-flex h-10 items-center justify-center rounded-lg bg-[#1D75F8] px-5 text-[13px] font-medium text-white shadow-sm transition-colors hover:bg-[#1569E8] active:bg-[#145FDB] sm:h-11 sm:min-w-[140px] sm:text-[14px]"
+            className="inline-flex h-10 items-center justify-center rounded-lg bg-[#1458CC] px-5 text-[13px] font-medium text-white shadow-sm transition-colors hover:bg-[#124A9E] active:bg-[#0F3D82] sm:h-11 sm:min-w-[140px] sm:text-[14px]"
           >
             Download Layout
           </button>
