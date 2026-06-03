@@ -57,7 +57,7 @@ export default function Construction() {
           {/* refresh button */}
           <button className="w-[142px] h-[40px] rounded-[8px] flex  gap-2 items-center justify-center bg-white border border-[#0070FF]">
             <Image
-              src="./icons/refresh_icon.svg"
+              src="../icons/refresh_icon.svg"
               alt="refresh icon"
               width={20}
               height={20}
@@ -75,7 +75,7 @@ export default function Construction() {
             className="cursor-pointer w-[142px] h-[40px] rounded-[8px] flex  gap-2 items-center justify-center bg-[#0070FF]"
           >
             <Image
-              src="./icons/add_icon.svg"
+              src="../icons/add_icon.svg"
               alt="add icon"
               width={20}
               height={20}

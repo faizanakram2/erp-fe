@@ -41,7 +41,7 @@ const ActiveProjects = () => {
               {/* description  and image */}
               <div className="flex gap-2 items-center">
                 <Image
-                  src="./icons/construction_icon.svg"
+                  src="../icons/construction_icon.svg"
                   alt="status icon"
                   width={24}
                   height={24}
@@ -59,7 +59,7 @@ const ActiveProjects = () => {
               {/* status */}
               <div className="h-[24px] w-[80px] px-1 rounded-[48px] bg-[#0070FF] flex items-center justify-center">
                 <Image
-                  src="./icons/status_icon.svg"
+                  src="../icons/status_icon.svg"
                   alt="status icon"
                   width={24}
                   height={24}

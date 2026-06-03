@@ -12,26 +12,26 @@ export default function Page() {
       title: "Leads",
       value: "4500",
       subtitle: "225.0M",
-      icon: "./icons/lead_icon.svg",
+      icon: "../icons/lead_icon.svg",
     },
     {
       title: "Qualified",
       value: "28",
       subtitle: "14.0M",
-      icon: "./icons/qualified_icon.svg",
+      icon: "../icons/qualified_icon.svg",
     },
     {
       title: "Proposal",
       value: "2876",
       subtitle: "14.0M",
-      icon: "./icons/proposal_icon.svg",
+      icon: "../icons/proposal_icon.svg",
     },
 
     {
       title: "Construction",
       value: "287600",
       subtitle: "14.0M",
-      icon: "./icons/construction_icon.svg",
+      icon: "../icons/construction_icon.svg",
     },
   ];
 

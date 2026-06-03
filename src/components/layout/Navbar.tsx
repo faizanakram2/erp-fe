@@ -10,23 +10,23 @@ export const Navbar = ({ onMenuClick }: NavbarProps) => {
   const [pageName, setPageName] = useState<string>("");
   const pathName = usePathname();
   useEffect(() => {
-    if (pathName === "/") {
+    if (pathName === "/users") {
       setPageName("Dashboards");
-    } else if (pathName === "/land-planning") {
+    } else if (pathName === "/users/land-planning") {
       setPageName("Land Planning");
-    } else if (pathName === "/construction") {
+    } else if (pathName === "/users/construction") {
       setPageName("Construction");
-    } else if (pathName === "/sales-crm") {
+    } else if (pathName === "/users/sales-crm") {
       setPageName("Sales & CRM");
-    } else if (pathName === "/finance") {
+    } else if (pathName === "/users/finance") {
       setPageName("Finance");
-    } else if (pathName === "/human-resources") {
+    } else if (pathName === "/users/human-resources") {
       setPageName("Human Resources");
-    } else if (pathName === "/inventory") {
+    } else if (pathName === "/users/inventory") {
       setPageName("Inventory");
-    } else if (pathName === "/reports") {
+    } else if (pathName === "/users/reports") {
       setPageName("Reports");
-    } else if (pathName === "/settings") {
+    } else if (pathName === "/users/settings") {
       setPageName("Settings");
     }
   }, [pathName]);
