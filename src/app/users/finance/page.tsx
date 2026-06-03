@@ -14,25 +14,25 @@ export default function Page() {
       title: "Total Assets",
       value: "225.0M",
 
-      icon: "./icons/assests_icon.svg",
+      icon: "../icons/assests_icon.svg",
     },
     {
       title: "Total Liabilities",
       value: "14.0M",
 
-      icon: "./icons/qualified_icon.svg",
+      icon: "../icons/qualified_icon.svg",
     },
     {
       title: "Monthly Profit",
       value: "14.0M",
-      icon: "./icons/profit_icon.svg",
+      icon: "../icons/profit_icon.svg",
     },
 
     {
       title: "Net Worth",
       value: "61.0M",
 
-      icon: "./icons/dollar2_icon.svg",
+      icon: "../icons/dollar2_icon.svg",
     },
   ];
 

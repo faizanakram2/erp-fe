@@ -62,7 +62,7 @@ const RecentSalesTab = () => {
               {/* dollar icon */}
               <div className="bg-[#CEDBED] w-[50px]  h-[50px] rounded-[8px] flex items-center justify-center">
                 <Image
-                  src="./icons/dollar_icon.svg"
+                  src="../icons/dollar_icon.svg"
                   alt="dollar icon"
                   width={31}
                   height={31}

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import { UIProvider } from "@/context/ui_context";
 
 export const metadata: Metadata = {
   title: "Real Estate Web  App",
@@ -17,7 +18,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`h-full antialiased ${poppins.className}`}>
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <UIProvider>{children}</UIProvider>
+      </body>
     </html>
   );
 }

@@ -25,7 +25,7 @@ export default function WorkStages() {
         {/* Header */}
         <div className="flex items-center gap-2">
           <Image
-            src="./icons/construction_icon.svg"
+            src="../icons/construction_icon.svg"
             alt="Constructor Image"
             width={24}
             height={24}

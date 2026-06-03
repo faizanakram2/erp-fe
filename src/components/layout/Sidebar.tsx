@@ -1,10 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-
+import { useUI } from "@/context/ui_context";
 type SidebarProps = {
   isCollapsed: boolean;
   setIsCollapsed: React.Dispatch<React.SetStateAction<boolean>>;
@@ -15,53 +14,123 @@ type SidebarProps = {
 const Sidebar = ({ isCollapsed, setIsCollapsed, onNavigate }: SidebarProps) => {
   const isExpanded = !isCollapsed;
   const pathname = usePathname();
+  const { activeUI } = useUI();
 
-  const menuItems = [
-    { id: "1", label: "Dashboard", icon: "/icons/dashboard.svg", href: "/" },
+  const userItems = [
+    {
+      id: "1",
+      label: "Dashboard",
+      icon: "/icons/dashboard.svg",
+      href: "/users",
+    },
     {
       id: "2",
       label: "Land & Planning",
       icon: "/icons/landAndPlanning.svg",
-      href: "/land-planning",
+      href: "/users/land-planning",
     },
     {
       id: "3",
       label: "Construction",
       icon: "/icons/construction.svg",
-      href: "/construction",
+      href: "/users/construction",
     },
     {
       id: "4",
       label: "Sales & CRM",
       icon: "/icons/salesAndCrm.svg",
-      href: "/sales-crm",
+      href: "/users/sales-crm",
     },
     {
       id: "5",
       label: "Human Resources",
       icon: "/icons/HumanResources.svg",
-      href: "/human-resources",
+      href: "/users/human-resources",
     },
     {
       id: "6",
       label: "Finance & Accounting",
       icon: "/icons/Finance.svg",
-      href: "/finance",
+      href: "/users/finance",
     },
     {
       id: "7",
       label: "Inventory",
       icon: "/icons/inventory.svg",
-      href: "/inventory",
+      href: "/users/inventory",
     },
-    { id: "8", label: "Reports", icon: "/icons/reports.svg", href: "/reports" },
+    {
+      id: "8",
+      label: "Reports",
+      icon: "/icons/reports.svg",
+      href: "/users/reports",
+    },
     {
       id: "9",
       label: "Settings",
       icon: "/icons/settings.svg",
-      href: "/settings",
+      href: "/users/settings",
     },
   ];
+
+  const managerItems = [
+    {
+      id: "1",
+      label: "Dashboard",
+      icon: "/icons/dashboard.svg",
+      href: "/manager",
+    },
+    {
+      id: "2",
+      label: "Projects",
+      icon: "/icons/projectsIcon.svg",
+      href: "/manager/projects",
+    },
+    {
+      id: "3",
+      label: "Customers",
+      icon: "/icons/customersIcon.svg",
+      href: "/manager/customers",
+    },
+    {
+      id: "4",
+      label: "Bookings",
+      icon: "/icons/bookingsIcon.svg",
+      href: "/manager/bookings",
+    },
+    {
+      id: "5",
+      label: "Payments",
+      icon: "/icons/paymentsIcon.svg",
+      href: "/manager/payments",
+    },
+    {
+      id: "6",
+      label: "Constructions",
+      icon: "/icons/constructionsIcon.svg",
+      href: "/manager/constructions",
+    },
+    {
+      id: "7",
+      label: "Vendors",
+      icon: "/icons/vendorsIcon.svg",
+      href: "/manager/vendors",
+    },
+    {
+      id: "8",
+      label: "Reports",
+      icon: "/icons/reportIcon.svg",
+      href: "/manager/reports",
+    },
+    {
+      id: "9",
+      label: "Users",
+      icon: "/icons/userIcon.svg",
+      href: "/manager/users",
+    },
+  ];
+
+  const activeMenuItems = activeUI === "manager" ? managerItems : userItems;
 
   return (
     <div
@@ -104,16 +173,14 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, onNavigate }: SidebarProps) => {
 
         {/* MENU */}
         <div className="flex flex-col gap-0 w-full px-2 ">
-          {menuItems.map((item) => (
+          {activeMenuItems.map((item) => (
             <Link
               key={item.id}
               href={item.href}
               onClick={() => onNavigate?.()}
               className={`flex items-center gap-2 px-2 py-2 rounded-md cursor-pointer hover:bg-gray-100 ${
                 isCollapsed ? "justify-center" : ""
-              } ${
-                pathname === item.href ? "bg-[#EFF6FF]" : ""
-              }`}
+              } ${pathname === item.href ? "bg-[#EFF6FF]" : ""}`}
             >
               <Image src={item.icon} alt={item.label} width={20} height={20} />
 
