@@ -1,5 +1,7 @@
 "use client";
 
+import DashboardHeader from "@/components/common/dashboardHeader";
+import { Plus } from "lucide-react";
 import React from "react";
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -382,20 +384,17 @@ export default function ManagerDashboard() {
     },
   ];
   return (
-    <div className="min-h-screen  p-6">
-      <div className="max-w-5xl mx-auto space-y-5">
+    <div className="min-h-screen p-6">
+      <div className="max-w-6xl mx-auto space-y-5">
         {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold text-[#0A0A0A] leading-tight">
-            Welcome back, Project Manager!
-          </h1>
-          <p className="text-sm text-[#45556C] mt-0.5">
-            Here&apos;s what&apos;s happening in your organization
-          </p>
-          <span className="inline-block mt-2 text-xs font-semibold text-[#0A0A0A] tracking-widest uppercase">
-            MANAGER
-          </span>
-        </div>
+        <DashboardHeader
+          title="Welcome back, Project Manager!"
+          description="Here's what's happening in your organization"
+          badge="Manager"
+          // buttonText="New Project"
+          // buttonIcon={<Plus className="h-4 w-4" />}
+          // onButtonClick={() => console.log("Create Project")}
+        />
 
         {/* Stat Cards */}
         <div className="flex gap-4">
