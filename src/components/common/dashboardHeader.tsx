@@ -25,7 +25,7 @@ export default function DashboardHeader({
           {title}
         </h1>
 
-        <p className="mt-1 text-sm text-[#45556C]">
+        <p className="mt-1 text-[#45556C]">
           {description}
         </p>
 
