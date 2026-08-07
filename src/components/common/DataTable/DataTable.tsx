@@ -17,11 +17,13 @@ import {
 } from "@/components/ui/table";
 
 interface DataTableProps<TData, TValue> {
+  title: string;
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
 }
 
 export function DataTable<TData, TValue>({
+  title,
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
@@ -35,8 +37,8 @@ export function DataTable<TData, TValue>({
   return (
     <div className="rounded-2xl border bg-white p-6">
 
-      <h2 className="mb-6 text-xl font-semibold">
-        All Customers
+      <h2 className="mb-6 text-lg font-medium">
+        {title}
       </h2>
 
       <Table>
