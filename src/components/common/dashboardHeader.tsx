@@ -1,6 +1,8 @@
+import { LucideIcon } from "lucide-react";
 
 interface HeaderProps {
   title: string;
+  icon?: LucideIcon;
   description: string;
 
   badge?: string;
@@ -12,6 +14,7 @@ interface HeaderProps {
 
 export default function DashboardHeader({
   title,
+  icon: Icon,
   description,
   badge,
   buttonText,
@@ -21,9 +24,14 @@ export default function DashboardHeader({
   return (
     <div className="flex items-center justify-between">
       <div>
-        <h1 className="text-3xl font-bold leading-tight text-[#0A0A0A]">
-          {title}
-        </h1>
+        <div className="flex items-center gap-2">
+          {Icon && (
+            <Icon className="h-7 w-7 text-[#155DFC]" />
+          )}
+          <h1 className="text-3xl font-bold leading-tight text-[#0A0A0A]">
+            {title}
+          </h1>
+        </div>
 
         <p className="mt-1 text-[#45556C]">
           {description}
