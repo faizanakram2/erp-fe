@@ -1,7 +1,8 @@
 "use client";
 
 import AppToolbar from "@/components/common/AppToolbar";
-import { Filter } from "lucide-react";
+import DashboardHeader from "@/components/common/dashboardHeader";
+import { Filter, Plus } from "lucide-react";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 type ProjectStatus = "ACTIVE" | "COMPLETED" | "INACTIVE";
@@ -139,12 +140,12 @@ function ProgressBar({ sold, total }: { sold: number; total: number }) {
 // ── Project Card ───────────────────────────────────────────────────────────
 function ProjectCard({ project }: { project: Project }) {
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-4 flex flex-col gap-3">
+    <div className="bg-white rounded-lg border border-gray-200 p-6 flex flex-col gap-3">
       {/* Title row */}
       <div className="flex items-start justify-between gap-2">
         <h3 className="text-lg font-medium text-[#0A0A0A]">{project.name}</h3>
-        <div className="px-8 py-2 rounded-[8px] bg-[#ECEEF2] border border-[#00000000]">
-          <h1 className="text-xs font-medium text-[#030213] ">
+        <div className={`px-6 py-2 rounded-[8px] ${project.status === "COMPLETED" ? "bg-[#000000] text-[#FFFFFF]" : "bg-[#ECEEF2]"}  border border-[#00000000]`}>
+          <h1 className={`text-sm font-medium ${project.status === "COMPLETED" ? "text-[#FFFFFF]" : "text-[#030213]"} `}>
             {project.status}
           </h1>
         </div>
@@ -160,16 +161,16 @@ function ProjectCard({ project }: { project: Project }) {
 
       {/* Type */}
       <div className="flex items-center justify-between">
-        <span className="text-xs text-gray-500">Type</span>
+        <span className="text-sm text-gray-500">Type</span>
         <span className="text-sm font-medium text-[#0A0A0A]">
           {project.type}
         </span>
       </div>
 
       {/* Plots Sold */}
-      <div className="flex flex-col gap-1.5">
+      <div className="flex flex-col gap-1.5 mb-3">
         <div className="flex items-center justify-between">
-          <span className="text-xs text-gray-500">Plots Sold</span>
+          <span className="text-sm text-gray-500">Plots Sold</span>
           <span className="text-sm font-medium text-[#0A0A0A]">
             {project.plotsSold} / {project.totalPlots}
           </span>
@@ -178,7 +179,7 @@ function ProjectCard({ project }: { project: Project }) {
       </div>
 
       {/* Footer */}
-      <div className="flex items-center justify-between pt-1">
+      <div className="flex items-center justify-between pt-3 border-t">
         <div className="flex items-center gap-1">
           <TrendIcon />
           <span className="text-xs font-semibold text-green-500">
@@ -196,57 +197,31 @@ function ProjectCard({ project }: { project: Project }) {
 // ── Main Page ──────────────────────────────────────────────────────────────
 export default function ProjectsPage() {
 
-  const handleExportCSV = () => {
-  console.log("Export CSV");
-};
 
   return (
     <div className="h-full  p-6 ">
-      <div className="max-w-5xl mx-auto space-y-5">
+      <div className="max-w-6xl mx-auto space-y-5">
         {/* Header */}
-        <div className="flex items-start justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-[#0A0A0A]">Projects</h1>
-            <p className="text-base font-regular  text-[#45556C] mt-0.5">
-              Manage housing societies and commercial projects
-            </p>
-          </div>
-          <button className="flex items-center gap-1.5 justify-center w-[132px] h-[36px] rounded-[8px] bg-[#030213] text-white text-sm font-medium">
-            <PlusIcon />
-            New Project
-          </button>
-        </div>
+       <DashboardHeader
+                 title="Projects"
+                 description="Manage housing societies and commercial projects"
+               buttonText="New Project"
+               buttonIcon={<Plus className="h-4 w-4" />}
+               onButtonClick={() => console.log("Create Project")}
+               />
 
-        {/* Search + Filter */}
-        {/* <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 flex-1 bg-[#F3F3F5] border border-[#00000000] rounded-lg px-3 py-2">
-            <SearchIcon />
-            <input
-              type="text"
-              placeholder="Search projects..."
-              className="flex-1 text-sm text-[#717182] placeholder-[#717182] outline-none bg-transparent"
-            />
-          </div>
-          <button className="flex items-center gap-1.5 bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
-            Filter
-          </button>
-        </div> */}
-
-        <AppToolbar
-          searchPlaceholder="Search customers by name, phone, or CNIC..."
+        <div className="my-6">
+          <AppToolbar
+          searchPlaceholder="Search projects"
           actions={[
             {
               id: "filter",
               label: "Filter",
               icon: <Filter size={16} />,
             },
-            {
-              id: "export",
-              label: "Export CSV",
-              onClick: handleExportCSV,
-            },
           ]}
         />
+        </div>
 
         {/* Project Cards Grid */}
         <div className="grid grid-cols-3 gap-4">
