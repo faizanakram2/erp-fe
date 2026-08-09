@@ -5,7 +5,7 @@ interface StatsCardProps {
   value: string | number;
   subtitle: string;
 
-  icon: LucideIcon;
+  icon?: LucideIcon;
 
   iconColor?: string;
   subtitleColor?: string;
@@ -31,13 +31,13 @@ export default function StatsCard({
           {title}
         </h3>
 
-        <Icon
-          className="h-6 w-6"
-          style={{ color: iconColor }}
-        />
+        {Icon && 
+        <Icon className="h-6 w-6"
+              style={{ color: iconColor }}
+        />}
       </div>
 
-      <div className="mt-6">
+      <div className="mt-8">
         <h2 className="text-3xl font-bold tracking-tight text-[#0A0A0A]">
           {value}
         </h2>
