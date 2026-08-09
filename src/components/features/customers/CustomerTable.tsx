@@ -5,6 +5,7 @@ import { customers } from "./data";
 export default function CustomerTable() {
   return (
     <DataTable
+      title="All Customers"
       columns={columns}
       data={customers}
     />
