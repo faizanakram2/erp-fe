@@ -10,7 +10,7 @@ export const Navbar = ({ onMenuClick }: NavbarProps) => {
   const [pageName, setPageName] = useState<string>("");
   const pathName = usePathname();
   useEffect(() => {
-    if (pathName === "/users") {
+    if (pathName === "/users" || pathName === "/manager") {
       setPageName("Dashboards");
     } else if (pathName === "/users/land-planning") {
       setPageName("Land Planning");
@@ -35,23 +35,23 @@ export const Navbar = ({ onMenuClick }: NavbarProps) => {
     <div className="h-[56px] min-h-[56px] sm:h-[79px] sm:min-h-[79px] bg-[#FFFFFF] flex items-center justify-between px-3 sm:px-6 shadow-sm shrink-0">
       {/* logo and heading */}
 
-      <div className="flex gap-2 items-center min-w-0">
+      <div className="flex gap-4 items-center min-w-0">
         <button
           type="button"
           onClick={onMenuClick}
-          className="md:hidden shrink-0 rounded-lg p-1 -ml-1 text-[#081021] hover:bg-slate-100 active:bg-slate-200"
+          className=" shrink-0 rounded-lg p-1 -ml-1 text-[#081021] hover:bg-slate-100 active:bg-slate-200"
           aria-label="Open navigation menu"
         >
           <Image
             src="/icons/tabler_menu.svg"
-            alt=""
+            alt="icon"
             width={32}
             height={32}
             className="object-cover"
           />
         </button>
 
-        <h1 className="font-semibold text-[16px] sm:text-[20px] text-[#081021] truncate">
+        <h1 className="text-[16px] sm:text-[20px] text-[#00000066] truncate">
           {pageName}
         </h1>
       </div>

@@ -1,5 +1,8 @@
 "use client";
 
+import AppToolbar from "@/components/common/AppToolbar";
+import { Filter } from "lucide-react";
+
 // ── Types ──────────────────────────────────────────────────────────────────
 type ProjectStatus = "ACTIVE" | "COMPLETED" | "INACTIVE";
 
@@ -192,6 +195,11 @@ function ProjectCard({ project }: { project: Project }) {
 
 // ── Main Page ──────────────────────────────────────────────────────────────
 export default function ProjectsPage() {
+
+  const handleExportCSV = () => {
+  console.log("Export CSV");
+};
+
   return (
     <div className="h-full  p-6 ">
       <div className="max-w-5xl mx-auto space-y-5">
@@ -210,7 +218,7 @@ export default function ProjectsPage() {
         </div>
 
         {/* Search + Filter */}
-        <div className="flex items-center gap-3">
+        {/* <div className="flex items-center gap-3">
           <div className="flex items-center gap-2 flex-1 bg-[#F3F3F5] border border-[#00000000] rounded-lg px-3 py-2">
             <SearchIcon />
             <input
@@ -222,7 +230,23 @@ export default function ProjectsPage() {
           <button className="flex items-center gap-1.5 bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
             Filter
           </button>
-        </div>
+        </div> */}
+
+        <AppToolbar
+          searchPlaceholder="Search customers by name, phone, or CNIC..."
+          actions={[
+            {
+              id: "filter",
+              label: "Filter",
+              icon: <Filter size={16} />,
+            },
+            {
+              id: "export",
+              label: "Export CSV",
+              onClick: handleExportCSV,
+            },
+          ]}
+        />
 
         {/* Project Cards Grid */}
         <div className="grid grid-cols-3 gap-4">

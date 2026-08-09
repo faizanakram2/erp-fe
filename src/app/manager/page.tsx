@@ -1,5 +1,14 @@
 "use client";
 
+import DashboardHeader from "@/components/common/dashboardHeader";
+import StatsCard from "@/components/common/StatsCard";
+import {
+  DollarSign,
+  Users,
+  CalendarDays,
+  CircleAlert,
+  TrendingUp,
+} from "lucide-react";
 import React from "react";
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -37,6 +46,7 @@ interface PaymentRowProps {
 
 interface QuickActionProps {
   icon: React.ReactNode;
+  iconColor: string;
   label: string;
   sub: string;
   bgColor: string;
@@ -185,32 +195,10 @@ const ReportsIcon = () => (
   </svg>
 );
 
-// ── Stat Card ──────────────────────────────────────────────────────────────
-function StatCard({
-  label,
-  icon,
-  value,
-  sub,
-  subColor = "text-green-500",
-}: StatCardProps) {
-  return (
-    <div className="bg-white rounded-lg border border-gray-200 p-4 flex-1 min-w-0">
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-sm text-[#0A0A0A] font-medium">{label}</span>
-        <span>{icon}</span>
-      </div>
-      <div className="text-2xl font-bold text-gray-900 leading-tight">
-        {value}
-      </div>
-      <div className={`text-xs  mt-1  ${subColor}`}>{sub}</div>
-    </div>
-  );
-}
-
 // ── Booking Row ────────────────────────────────────────────────────────────
 function BookingRow({ id, name, address, badge, amount }: BookingRowProps) {
   return (
-    <div className="flex items-center justify-between py-3 border-b border-gray-100 last:border-b-0">
+    <div className="flex items-center justify-between p-4 border-b border-gray-100 last:border-b-0">
       <div className="flex-1 min-w-0">
         <div className="text-sm font-semibold text-gray-900">{id}</div>
         <div className="text-xs text-gray-500 mt-0.5">{name}</div>
@@ -234,7 +222,7 @@ function PaymentRow({
   amount,
 }: PaymentRowProps) {
   return (
-    <div className="flex items-center justify-between py-3 border-b border-gray-100 last:border-b-0">
+    <div className="flex items-center justify-between p-4 border-b border-gray-100 last:border-b-0">
       <div className="flex-1 min-w-0">
         <div className="text-sm font-semibold text-gray-900">{id}</div>
         <div className="text-xs text-gray-500 mt-0.5">{name}</div>
@@ -253,14 +241,14 @@ function PaymentRow({
 }
 
 // ── Quick Action ───────────────────────────────────────────────────────────
-function QuickAction({ icon, label, sub, bgColor }: QuickActionProps) {
+function QuickAction({ icon, iconColor, label, sub, bgColor }: QuickActionProps) {
   return (
-    <button className="flex items-center gap-3 px-4 py-3 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 transition-colors flex-1 min-w-0 text-left">
+    <button className="flex items-center gap-3 px-4 p-4 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 transition-colors flex-1 min-w-0 text-left">
       <div
         className={`w-9 h-9 rounded-lg  flex items-center justify-center flex-shrink-0`}
         style={{ backgroundColor: bgColor }}
       >
-        {icon}
+        <span className="" style={{color: iconColor}}>{icon}</span>
       </div>
       <div>
         <div className="text-sm font-medium text-[#0A0A0A]">{label}</div>
@@ -272,38 +260,43 @@ function QuickAction({ icon, label, sub, bgColor }: QuickActionProps) {
 
 // ── Main Dashboard ─────────────────────────────────────────────────────────
 export default function ManagerDashboard() {
-  const statCards = [
+
+  const stats = [
     {
       id: 1,
-      label: "Total Revenue",
-      icon: <DollarIcon />,
+      title: "Total Revenue",
       value: "PKR 750.0M",
-      sub: "+12.5% from last month",
-      subColor: "text-gray-500",
+      subtitle: "+12.5% from last month",
+      icon: DollarSign,
+      iconColor: "#22C55E",
+      subtitleColor: "#64748B",
     },
     {
       id: 2,
-      label: "Total Customers",
-      icon: <UsersIcon />,
-      value: "287",
-      sub: "+8 new this month",
-      subColor: "text-gray-500",
+      title: "Total Customers",
+      value: 287,
+      subtitle: "+8 new this month",
+      icon: Users,
+      iconColor: "#2563EB",
+      subtitleColor: "#64748B",
     },
     {
       id: 3,
-      label: "Active Bookings",
-      icon: <BookingsIcon />,
-      value: "145",
-      sub: "5 projects",
-      subColor: "text-gray-500",
+      title: "Active Bookings",
+      value: 145,
+      subtitle: "5 projects",
+      icon: CalendarDays,
+      iconColor: "#8B5CF6",
+      subtitleColor: "#64748B",
     },
     {
       id: 4,
-      label: "Overdue Installments",
-      icon: <AlertIcon />,
-      value: "12",
-      sub: "Requires attention",
-      subColor: "text-red-500",
+      title: "Overdue Installments",
+      value: 12,
+      subtitle: "Requires attention",
+      icon: CircleAlert,
+      iconColor: "#EF4444",
+      subtitleColor: "#EF4444",
     },
   ];
 
@@ -362,6 +355,7 @@ export default function ManagerDashboard() {
     {
       id: 1,
       icon: <ReviewIcon />,
+      iconColor: "#34354",
       label: "Review Bookings",
       sub: "Approve pending bookings",
       bgColor: "#DBEAFE",
@@ -369,55 +363,53 @@ export default function ManagerDashboard() {
     {
       id: 2,
       icon: <CustomerIcon />,
+      iconColor: "#34354",
       label: "Customer List",
       sub: "View all customers",
       bgColor: "#DBEAFE",
     },
     {
       id: 3,
-      icon: <ReportsIcon />,
+      icon: <TrendingUp />,
+      iconColor: "#9810FA",
       label: "Reports",
       sub: "Collection forecast",
       bgColor: "#DBEAFE",
     },
   ];
   return (
-    <div className="min-h-screen  p-6">
-      <div className="max-w-5xl mx-auto space-y-5">
+    <div className="min-h-screen p-6">
+      <div className="max-w-6xl mx-auto space-y-5">
         {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold text-[#0A0A0A] leading-tight">
-            Welcome back, Project Manager!
-          </h1>
-          <p className="text-sm text-[#45556C] mt-0.5">
-            Here&apos;s what&apos;s happening in your organization
-          </p>
-          <span className="inline-block mt-2 text-xs font-semibold text-[#0A0A0A] tracking-widest uppercase">
-            MANAGER
-          </span>
-        </div>
+        <DashboardHeader
+          title="Welcome back, Project Manager!"
+          description="Here's what's happening in your organization"
+          badge="Manager"
+        // buttonText="New Project"
+        // buttonIcon={<Plus className="h-4 w-4" />}
+        // onButtonClick={() => console.log("Create Project")}
+        />
 
         {/* Stat Cards */}
-        <div className="flex gap-4">
-          {statCards.map((card) => {
-            return (
-              <StatCard
-                key={card.id}
-                label={card.label}
-                icon={card.icon}
-                value={card.value}
-                sub={card.sub}
-                subColor={card.subColor}
-              />
-            );
-          })}
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
+          {stats.map((stat) => (
+            <StatsCard
+              key={stat.id}
+              title={stat.title}
+              value={stat.value}
+              subtitle={stat.subtitle}
+              icon={stat.icon}
+              iconColor={stat.iconColor}
+              subtitleColor={stat.subtitleColor}
+            />
+          ))}
         </div>
 
         {/* Recent Bookings + Recent Payments */}
         <div className="grid grid-cols-2 gap-4">
           {/* Recent Bookings */}
           <div className="bg-white rounded-lg border border-[#0000001A] p-4">
-            <h2 className="text-base font-medium text-[#0A0A0A] mb-1">
+            <h2 className="text-base font-medium text-[#0A0A0A] mb-1 px-4">
               Recent Bookings
             </h2>
             <div className="divide-y divide-gray-100">
@@ -436,7 +428,7 @@ export default function ManagerDashboard() {
 
           {/* Recent Payments */}
           <div className="bg-white rounded-lg border border-[#0000001A] p-4">
-            <h2 className="text-sm font-bold text-gray-900 mb-1">
+            <h2 className="text-sm font-bold text-gray-900 mb-1 px-4">
               Recent Payments
             </h2>
             <div className="divide-y divide-gray-100">
@@ -457,15 +449,16 @@ export default function ManagerDashboard() {
 
         {/* Quick Actions */}
         <div className="bg-white rounded-lg border border-[#0000001A] p-4">
-          <h2 className="text-base font-medium text-[#0A0A0A] mb-3">
+          <h2 className="text-base font-medium text-[#0A0A0A] mb-3 px-4">
             Quick Actions for <span className="uppercase">MANAGER</span>
           </h2>
-          <div className="flex gap-3">
+          <div className="flex gap-3 p-4">
             {quickActions.map((action) => {
               return (
                 <QuickAction
                   key={action.id}
                   icon={action.icon}
+                  iconColor={action.iconColor}
                   label={action.label}
                   sub={action.sub}
                   bgColor={action.bgColor}

@@ -255,7 +255,7 @@ const Dashboard = () => {
           </div>
           <div className="grid grid-cols-2 gap-6 w-[288px]">
             {pieData.map((data, index) => (
-              <div className=" flex justify-between">
+              <div key={index} className=" flex justify-between">
                 {/* Left side: Dot and Name */}
                 <div className="flex items-center gap-1">
                   <div
