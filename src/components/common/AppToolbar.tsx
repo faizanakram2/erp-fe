@@ -71,7 +71,7 @@ export default function AppToolbar({
                   setActiveActionId(action.id);
                   action.onClick?.();
                 }}
-                className={`flex h-11 items-center gap-2 rounded-lg border px-4 text-sm font-medium transition ${
+                className={`flex h-11 items-center uppercase gap-2 rounded-lg border px-4 text-sm font-medium transition ${
                   isActive
                     ? "border-black bg-black text-white"
                     : "border-[#E4E4E7] bg-white text-black hover:bg-slate-50"
