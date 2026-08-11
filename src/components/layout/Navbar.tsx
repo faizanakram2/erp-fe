@@ -1,35 +1,17 @@
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+
+import { getPageName } from "@/lib/get-page-name";
 
 type NavbarProps = {
   onMenuClick?: () => void;
 };
 
+
 export const Navbar = ({ onMenuClick }: NavbarProps) => {
-  const [pageName, setPageName] = useState<string>("");
-  const pathName = usePathname();
-  useEffect(() => {
-    if (pathName === "/users" || pathName === "/manager") {
-      setPageName("Dashboards");
-    } else if (pathName === "/users/land-planning") {
-      setPageName("Land Planning");
-    } else if (pathName === "/users/construction") {
-      setPageName("Construction");
-    } else if (pathName === "/users/sales-crm") {
-      setPageName("Sales & CRM");
-    } else if (pathName === "/users/finance") {
-      setPageName("Finance");
-    } else if (pathName === "/users/human-resources") {
-      setPageName("Human Resources");
-    } else if (pathName === "/users/inventory") {
-      setPageName("Inventory");
-    } else if (pathName === "/users/reports") {
-      setPageName("Reports");
-    } else if (pathName === "/users/settings") {
-      setPageName("Settings");
-    }
-  }, [pathName]);
+  const pathname  = usePathname();
+
+   const pageName = getPageName(pathname);
 
   return (
     <div className="h-[56px] min-h-[56px] sm:h-[79px] sm:min-h-[79px] bg-[#FFFFFF] flex items-center justify-between px-3 sm:px-6 shadow-sm shrink-0">
