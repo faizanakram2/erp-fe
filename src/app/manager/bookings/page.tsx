@@ -1,7 +1,7 @@
 "use client"
 import AppToolbar from "@/components/common/AppToolbar";
 import DashboardHeader from "@/components/common/dashboardHeader";
-import BookingTable from "@/components/features/bookings/BookingTable";
+import BookingTable from "@/components/features/manager/bookings/BookingTable";
 import { Download, Filter, Plus } from "lucide-react";
 
 export default function BookingsPage() {
