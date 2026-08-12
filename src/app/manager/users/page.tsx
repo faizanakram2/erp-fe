@@ -4,7 +4,7 @@ import AppToolbar from "@/components/common/AppToolbar";
 import DashboardHeader from "@/components/common/dashboardHeader";
 import StatsCard from "@/components/common/StatsCard";
 import { CircleCheckBig, CircleX, Plus, User } from "lucide-react";
-import UserCard, { Users } from "@/components/features/users/UserCard";
+import UserCard, { Users } from "@/components/features/manager/users/UserCard";
 
 const users: Users[] = [
   {

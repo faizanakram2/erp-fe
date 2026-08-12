@@ -163,6 +163,7 @@ const filteredVendors = vendors.filter((vendor) => {
 
         <div className="my-6">
           <AppToolbar
+          defaultActiveAction="all"
             searchPlaceholder="Search by vendor name, category, or city..."
             actions={[
               {

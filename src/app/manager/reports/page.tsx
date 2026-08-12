@@ -8,10 +8,10 @@ import { Calendar, DollarSign, Download, TrendingUp, TriangleAlert, CalendarDays
 
 import ReportCard, {
   type Report,
-} from "@/components/features/reports/ReportCard";
+} from "@/components/features/manager/reports/ReportCard";
 import { Card, CardContent } from "@/components/ui/card";
-import CollectionForecast from "@/components/features/reports/CollectionForecast";
-import ReceivablesAging from "@/components/features/reports/ReceivablesAging";
+import CollectionForecast from "@/components/features/manager/reports/CollectionForecast";
+import ReceivablesAging from "@/components/features/manager/reports/ReceivablesAging";
 
 const reports: Report[] = [
   {

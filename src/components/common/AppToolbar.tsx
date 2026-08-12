@@ -32,10 +32,12 @@ export default function AppToolbar({
   className = "",
   defaultActiveAction,
 }: AppToolbarProps) {
-  const [activeActionId, setActiveActionId] = useState<string | null>(
-    defaultActiveAction ?? actions[0]?.id ?? null
-  );
-
+  // const [activeActionId, setActiveActionId] = useState<string | null>(
+  //   defaultActiveAction ?? actions[0]?.id ?? null
+  // );
+const [activeActionId, setActiveActionId] =
+  useState<string | null>(defaultActiveAction ?? null);
+  
   return (
     <div
       className={`flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between ${className}`}

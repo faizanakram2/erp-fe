@@ -1,7 +1,7 @@
 import AppToolbar from "@/components/common/AppToolbar";
 import DashboardHeader from "@/components/common/dashboardHeader";
 import StatsCard from "@/components/common/StatsCard";
-import PaymentsTable from "@/components/features/payments/PaymentsTable";
+import PaymentsTable from "@/components/features/manager/payments/PaymentsTable";
 import { Filter } from "lucide-react";
 
 const stats = [

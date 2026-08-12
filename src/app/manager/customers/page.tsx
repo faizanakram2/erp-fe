@@ -1,7 +1,7 @@
 "use client"
 import AppToolbar from "@/components/common/AppToolbar";
 import DashboardHeader from "@/components/common/dashboardHeader";
-import CustomerTable from "@/components/features/customers/CustomerTable";
+import CustomerTable from "@/components/features/manager/customers/CustomerTable";
 import { Download, Filter, Plus } from "lucide-react";
 
 export default function CustomersPage() {

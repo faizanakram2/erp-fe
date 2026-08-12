@@ -3,7 +3,7 @@
 import DashboardHeader from "@/components/common/dashboardHeader";
 import DashboardListCard, { DashboardListItem } from "@/components/common/DashboardListCard";
 import QuickActions from "@/components/common/QuickActions";
-import { salesAgentQuickActions } from "@/data/sales-agent-dashboard";
+import { salesAgentQuickActions } from "@/data/sales-agents-data/sales-agent-dashboard";
 
 export const recentBookings: DashboardListItem[] = [
   {
