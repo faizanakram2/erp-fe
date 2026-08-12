@@ -19,16 +19,22 @@ type SidebarProps = {
 const Sidebar = ({ isCollapsed, setIsCollapsed, onNavigate }: SidebarProps) => {
   const isExpanded = !isCollapsed;
   const pathname = usePathname();
-  const { activeUI } = useUI();
 
-  
+const sidebarByRole: Record<string, SidebarSection[]> = {
+  manager: managerSidebar,
+  "sales-agents": salesAgentSidebar,
+  users: userAgentSidebar,
+};
 
-  const activeSections: SidebarSection[] =
-    activeUI === "manager"
-      ? managerSidebar
-      : activeUI === "users"
-        ? userAgentSidebar
-        : salesAgentSidebar;
+const activeUI = pathname.startsWith("/sales-agents")
+  ? "sales-agents"
+  : pathname.startsWith("/manager")
+    ? "manager"
+    : pathname.startsWith("/users")
+      ? "users"
+      : "manager";
+
+const activeSections = sidebarByRole[activeUI];
 
   return (
     <div
@@ -84,8 +90,8 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, onNavigate }: SidebarProps) => {
                     href={item.href}
                     onClick={() => onNavigate?.()}
                     className={`flex items-center gap-3 rounded-xl px-3 py-3 transition-colors ${pathname === item.href
-                        ? "bg-[#EEF2FF]"
-                        : "hover:bg-gray-100"
+                      ? "bg-[#EEF2FF]"
+                      : "hover:bg-gray-100"
                       } ${isCollapsed ? "justify-center" : ""}`}
                   >
                     <Image
@@ -98,8 +104,8 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, onNavigate }: SidebarProps) => {
                     {isExpanded && (
                       <span
                         className={`text-[15px] font-medium ${pathname === item.href
-                            ? "text-[#2563EB]"
-                            : "text-[#64748B]"
+                          ? "text-[#2563EB]"
+                          : "text-[#64748B]"
                           }`}
                       >
                         {item.label}
